@@ -13,9 +13,11 @@ You need to have the following installed: ```plink/plink2, R ```
 In my case, I use Plink data (.bed, .bim, .fam files) downloaded from the ADNI1, ADNI2, and ADNIGO studies.
 
 ## What are the necessary steps in a GWAS?
-Step 1: 
+Step 1: Handle missingness per individual and per SNP: Delete individuals with missingness >0.05
 
-Step 2:
+Step 2: Check for sex discrepancy: Subjects who were a priori determined as females must have a F value of <0.2, and subjects who were a priori determined as males must have a F value >0.8. This F value is based on the X chromosome inbreeding (homozygosity) estimate. Subjects who do not fulfil these requirements are flagged "PROBLEM" by PLINK.
+
+Step 3:
 
 ## Step 1:
 
