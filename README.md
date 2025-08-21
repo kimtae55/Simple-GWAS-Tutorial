@@ -9,7 +9,7 @@ I aggregate all components of GWAS into one repository, to clear the confusion o
 
 In my case, I use Plink data (.bed, .bim, .fam files) downloaded from the ADNI1, ADNI2, and ADNIGO studies.
 
-## What are the sequential steps in a GWAS?
+## What are the necessary steps in a GWAS?
 Step 1: 
 
 Step 2:
