@@ -5,7 +5,7 @@ Credits for the figures and explanations here go to the more in-depth tutorials:
 I aggregate all components of GWAS into one repository, to clear the confusion of what to download and when/how to run certain scripts. This means that you can replace my data with your .bed, .bim, .fam files and replicate the whole experiment. 
 
 ## Prerequisites
-You need to have the following installed: plink/plink2, R 
+You need to have the following installed: ```plink/plink2, R ```
 
 ## Assumption: You have SNP data in PLINK format
 <img src="https://github.com/kimtae55/GWAS-End-to-End-Tutorial/blob/main/figs/plink.png" width="600">
