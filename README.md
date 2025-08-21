@@ -7,8 +7,9 @@ I aggregate all components of GWAS into one repository, to clear the confusion o
 ## PLINK format
 
 ## What are the sequential steps in a GWAS?
-- a
-- b
+Step 1:
+
+Step 2:
 
 ## Step 1:
 
