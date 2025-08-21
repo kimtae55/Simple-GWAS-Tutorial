@@ -4,5 +4,11 @@ Figures and explanations here are mostly based on in-depth tutorials: [GWASTutor
 
 I aggregate all components of GWAS into one repository, to clear the confusion of what to download and when/how to run certain scripts. This means that you can replace my data with your .bed, .bim, .fam files and replicate the whole experiment. 
 
-## 
+## PLINK format
+
+## What are the sequential steps in a GWAS?
+- a
+- b
+
+## Step 1:
 
