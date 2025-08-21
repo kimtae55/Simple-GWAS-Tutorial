@@ -7,6 +7,8 @@ I aggregate all components of GWAS into one repository, to clear the confusion o
 ## Assumption: You have SNP data in PLINK format
 ![gui_image](https://github.com/kimtae55/GWAS-End-to-End-Tutorial/blob/main/figs/plink.png)
 
+In my case, I use Plink data (.bed, .bim, .fam files) downloaded from the ADNI1, ADNI2, and ADNIGO studies.
+
 ## What are the sequential steps in a GWAS?
 Step 1: 
 
