@@ -5,7 +5,7 @@ Credits for the figures and explanations here go to the more in-depth tutorials:
 I aggregate all components of GWAS into one repository, to clear the confusion of what to download and when/how to run certain scripts. This means that you can replace my data with your .bed, .bim, .fam files and replicate the whole experiment. 
 
 ## Assumption: You have SNP data in PLINK format
-![gui_image]([https://github.com/kimtae55/DeepFDR/blob/main/figs/gui_sample.png](https://github.com/kimtae55/GWAS-End-to-End-Tutorial/blob/main/figs/plink.png))
+![gui_image](https://github.com/kimtae55/GWAS-End-to-End-Tutorial/blob/main/figs/plink.png)
 
 ## What are the sequential steps in a GWAS?
 Step 1: 
