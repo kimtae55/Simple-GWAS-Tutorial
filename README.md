@@ -32,9 +32,9 @@ Step 5: Remove individuals with a heterozygosity rate deviating more than 3 sd f
 
 Step 6: We exclude all individuals with a PI_HAT > 0.2 to remove cryptic relatedness, assuming a random population sample.
 
-## Population Structure Modeling:
+### Population Structure Modeling:
 
-## Lifting and Imputation:
+### Lifting and Imputation:
 
-## Associative Analysis:
+### Associative Analysis:
 
