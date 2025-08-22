@@ -14,7 +14,7 @@ In my case, I use Plink data (.bed, .bim, .fam files) downloaded from the ADNI1,
 
 ## What are the necessary steps in a GWAS?
 
-Quality Control --> Population Structure Modelign --> Imputation --> Associative Analysis 
+Quality Control --> Population Structure Modeling and Imputation --> Associative Analysis 
 
 Quality Control is done at a sample-level (to remove bad individuals; e.g. contamination, swaps, relatedness, sex mismatches) and SNP-level (to remove bad variatns; e.g. missingness, low MAF, HWE failures).
 
