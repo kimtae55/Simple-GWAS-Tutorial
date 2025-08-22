@@ -14,7 +14,7 @@ In my case, I use Plink data (.bed, .bim, .fam files) downloaded from the ADNI1,
 
 ## What are the necessary steps in a GWAS?
 
-### Quality Control --> Population Structure Modeling and Imputation --> Associative Analysis 
+### Quality Control --> Population Structure Modeling --> Lifting and Imputation --> Associative Analysis 
 
 Quality Control is done at a sample-level (to remove bad individuals; e.g. contamination, swaps, relatedness, sex mismatches) and SNP-level (to remove bad variatns; e.g. missingness, low MAF, HWE failures).
 
@@ -32,5 +32,9 @@ Step 5: Remove individuals with a heterozygosity rate deviating more than 3 sd f
 
 Step 6: We exclude all individuals with a PI_HAT > 0.2 to remove cryptic relatedness, assuming a random population sample.
 
-## Step 1:
+## Population Structure Modeling:
+
+## Lifting and Imputation:
+
+## Associative Analysis:
 
