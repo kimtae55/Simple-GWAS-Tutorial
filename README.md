@@ -21,6 +21,9 @@ Quality Control is done at a sample-level (to remove bad individuals; e.g. conta
 ### QC Steps:
 
 Step 1: Handle missingness per individual and per SNP: Delete individuals with missingness >0.05.
+```
+Code will go here
+```
 
 Step 2: Handle sex discrepancy: Subjects who were a priori determined as females must have a F value of <0.2, and subjects who were a priori determined as males must have a F value >0.8. This F value is based on the X chromosome inbreeding (homozygosity) estimate. Subjects who do not fulfil these requirements are flagged "PROBLEM" by PLINK.
 
