@@ -16,7 +16,7 @@ In my case, I use Plink data (.bed, .bim, .fam files) downloaded from the ADNI1,
 
 ## What are the necessary steps in a GWAS?
 
-### Quality Control --> Population Structure Modeling --> Liftover and Imputation --> Associative Analysis 
+### Quality Control --> Liftover and Imputation --> Population Structure Modeling --> Associative Analysis 
 
 Quality Control is done at a sample-level (to remove bad individuals; e.g. contamination, swaps, relatedness, sex mismatches) and SNP-level (to remove bad variants; e.g. missingness, low MAF, HWE failures).
 
@@ -37,13 +37,6 @@ Step 5: Remove individuals with a heterozygosity rate deviating more than 3 sd f
 
 Step 6: We exclude all individuals with a PI_HAT > 0.2 to remove cryptic relatedness, assuming a random population sample.
 
-### Population Structure Modeling:
-
-Step 1: Population stratification is corrected by extracting principal components (PCs) for each dataset separately using LD-pruned SNPs. The top PCs are used as covariates in GWAS to control for ancestry differences. 
-```
-Code will go here
-```
-
 ### Lifting and Imputation:
 
 Step 1: ADNI datasets are often on older genome builds (e.g., hg18/NCBI36). Before imputation, convert to hg19/GRCh37. This ensures all datasets use the same genome coordinates, resulting in .bed/.bim/.fam files aligned to GRCh37. 
@@ -56,14 +49,21 @@ Step 2: Imputation via Michigan Imputation Server
 Code will go here
 ```
 
-### Associative Analysis:
+### Population Structure Modeling:
 
-Step 1: Merge the three datasets as they are aligned and imputed on the same genome build.
+(Optional): If you have multiple datasets, merge all of them now that they are aligned and imputed on the same genome build, followed by post-merge quality check. 
 ```
 Code will go here
 ```
 
-Step 2: Run GWAS on progression (e.g. ADAS-Cog, MMSE)
+Step 1: Population stratification is corrected by extracting principal components (PCs) for each dataset separately using LD-pruned SNPs. The top PCs are used as covariates in GWAS to control for ancestry differences. 
+```
+Code will go here
+```
+
+### Associative Analysis:
+
+Run GWAS on progression (e.g. ADAS-Cog, MMSE)
 ```
 Code will go here
 ```
