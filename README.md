@@ -63,7 +63,16 @@ Step 1: Merge the three datasets as they are aligned and imputed on the same gen
 Code will go here
 ```
 
-Step 2: Run GWAS 
+Step 2: Run GWAS on progression (e.g. ADAS-Cog, MMSE)
 ```
 Code will go here
 ```
+
+## Application: Sparse Canoninical Correlation Analysis using Imaging-Omics (FDG-PET, SNP)
+
+Goal: To investigate how genetic variation (SNPs) and brain imaging features (FDG-PET ROIs) are related, and to assess how these associations change across disease stages (CN, MCI, AD). We use Sparse Canonical Correlation Analysis (SCCA) to identify low-dimensional, interpretable patterns linking high-dimensional SNP data with FDG-PET imaging phenotypes.
+
+Input: 
+- (n,p) SNP data matrix (split into CN, MCI, AD)
+- (n,q) FDG-PET data matrix (split into CN, MCI, AD)
+- Note that we did not use disease status (CN, MCI, AD) as outcomes for GWAS, because our goal is not to find SNPs associated with diagnosis, but rather SNPs linked to disease progression. Instead, we selected SNPs based on their association with continuous progression measures (e.g., cognitive decline, imaging biomarkers), so that the same SNP panel can be meaningfully compared across CN, MCI, and AD groups during SCCA.
