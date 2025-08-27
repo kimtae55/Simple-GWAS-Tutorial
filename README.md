@@ -76,3 +76,5 @@ Input:
 - (n,p) SNP data matrix (split into CN, MCI, AD)
 - (n,q) FDG-PET data matrix (split into CN, MCI, AD)
 - Note that we did not use disease status (CN, MCI, AD) as outcomes for GWAS, because our goal is not to find SNPs associated with diagnosis, but rather SNPs linked to disease progression. Instead, we selected SNPs based on their association with continuous progression measures (e.g., cognitive decline, imaging biomarkers), so that the same SNP panel can be meaningfully compared across CN, MCI, and AD groups during SCCA.
+
+Please read [this]() for the complete application details. 
