@@ -4,6 +4,8 @@ Credits for the figures and explanations here go to the more in-depth tutorials:
 
 I aggregate all components of GWAS into one repository, to clear the confusion of what to download and when/how to run certain scripts. This means that you can replace my data with your .bed, .bim, .fam files and replicate the whole experiment. 
 
+The output is a genotype matrix of shape (n x p), where n is the number of subjects, and p is the number of SNPs extracted from GWAS. 
+
 ## Prerequisites
 You need to have the following installed: ```plink/plink2, R ```
 
@@ -14,9 +16,9 @@ In my case, I use Plink data (.bed, .bim, .fam files) downloaded from the ADNI1,
 
 ## What are the necessary steps in a GWAS?
 
-### Quality Control --> Population Structure Modeling --> Lifting and Imputation --> Associative Analysis 
+### Quality Control --> Population Structure Modeling --> Liftover and Imputation --> Associative Analysis 
 
-Quality Control is done at a sample-level (to remove bad individuals; e.g. contamination, swaps, relatedness, sex mismatches) and SNP-level (to remove bad variatns; e.g. missingness, low MAF, HWE failures).
+Quality Control is done at a sample-level (to remove bad individuals; e.g. contamination, swaps, relatedness, sex mismatches) and SNP-level (to remove bad variants; e.g. missingness, low MAF, HWE failures).
 
 ### QC Steps:
 
@@ -40,4 +42,5 @@ Step 6: We exclude all individuals with a PI_HAT > 0.2 to remove cryptic related
 ### Lifting and Imputation:
 
 ### Associative Analysis:
+At this point, I merge the three datasets as they are aligned and imputed on the same genome build.
 
