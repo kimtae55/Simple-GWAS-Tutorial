@@ -12,7 +12,7 @@ You need to have the following installed: ```plink/plink2, R ```
 ## Assumption: You have SNP data in PLINK format
 <img src="https://github.com/kimtae55/GWAS-End-to-End-Tutorial/blob/main/figs/plink.png" width="600">
 
-In my case, I use Plink data (.bed, .bim, .fam files) downloaded from the ADNI1, ADNI2, and ADNIGO studies.
+In my case, I use Plink data (.bed, .bim, .fam files) downloaded from the ADNI1, ADNI2, and ADNIGO studies. For simplicity, all data, scripts, and outputs will be located in a single working directory. 
 
 ## What are the necessary steps in a GWAS?
 
@@ -39,8 +39,31 @@ Step 6: We exclude all individuals with a PI_HAT > 0.2 to remove cryptic related
 
 ### Population Structure Modeling:
 
+Step 1: Population stratification is corrected by extracting principal components (PCs) for each dataset separately using LD-pruned SNPs. The top PCs are used as covariates in GWAS to control for ancestry differences. 
+```
+Code will go here
+```
+
 ### Lifting and Imputation:
 
-### Associative Analysis:
-At this point, I merge the three datasets as they are aligned and imputed on the same genome build.
+Step 1: ADNI datasets are often on older genome builds (e.g., hg18/NCBI36). Before imputation, convert to hg19/GRCh37. This ensures all datasets use the same genome coordinates, resulting in .bed/.bim/.fam files aligned to GRCh37. 
+```
+Code will go here
+```
 
+Step 2: Imputation via Michigan Imputation Server
+```
+Code will go here
+```
+
+### Associative Analysis:
+
+Step 1: Merge the three datasets as they are aligned and imputed on the same genome build.
+```
+Code will go here
+```
+
+Step 2: Run GWAS 
+```
+Code will go here
+```
