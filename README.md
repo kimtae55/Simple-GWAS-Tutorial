@@ -1,4 +1,4 @@
-# GWAS-End-to-End-Tutorial
+# Simple GWAS Tutorial
 This is a Step by Step Tutorial for GWAS (for Plink format), explaining what SNP data looks like, how to perform quality control and imputation procedures, and how to run GWAS.
 Credits for the figures and explanations here go to the more in-depth tutorials: [GWASTutorial](https://cloufield.github.io/GWASTutorial) or [doi: 10.1002/mpr.1608](https://pmc.ncbi.nlm.nih.gov/articles/PMC6001694/). 
 
