@@ -1,6 +1,6 @@
 # Simple GWAS Tutorial
 This is a Step by Step Tutorial for GWAS (for Plink format), explaining what SNP data looks like, how to perform quality control and imputation procedures, and how to run GWAS.
-Credits for the figures and explanations here go to the more in-depth tutorials: [GWASTutorial](https://cloufield.github.io/GWASTutorial) or [doi: 10.1002/mpr.1608](https://pmc.ncbi.nlm.nih.gov/articles/PMC6001694/). The codes are taken from [https://github.com/MareesAT/GWA_tutorial](https://github.com/MareesAT/GWA_tutorial).
+Credits for the figures and explanations here go to the more in-depth tutorials: [GWASTutorial1](https://cloufield.github.io/GWASTutorial), [GWASTutorial2](https://www.ncbi.nlm.nih.gov/pubmed/29484742), or [GWASTutorial3](https://pmc.ncbi.nlm.nih.gov/articles/PMC6001694/). The codes are taken from [https://github.com/MareesAT/GWA_tutorial](https://github.com/MareesAT/GWA_tutorial).
 
 I aggregate all components of GWAS into one repository for study purposes, and to clear the confusion of what to download and when/how to run certain scripts. This means that you can replace my data with your .bed, .bim, .fam files and replicate the whole experiment. 
 
@@ -50,12 +50,15 @@ plink --bfile ADNI_cluster_01_forward_757LONI_4 --extract snp_1_22.txt --make-be
 
 Step 4: Delete SNPs which are not in Hardy-Weinberg equilibrium (HWE).
 ```
-
+> plink --bfile ADNI_cluster_01_forward_757LONI_6 --hardy
+> awk '{ if ($9 <0.00001) print $0 }' plink.hwe>plinkzoomhwe.hwe
+> Rscript --no-save hwe.R
+> plink --bfile ADNI_cluster_01_forward_757LONI_6 --hwe 1e-6 --hwe-all --make-bed --out ADNI_cluster_01_forward_757LONI_7
 ```
 
 Step 5: Remove individuals with a heterozygosity rate deviating more than 3 sd from the mean.
 ```
-Code will go here
+
 ```
 
 Step 6: We exclude all individuals with a PI_HAT > 0.2 to remove cryptic relatedness, assuming a random population sample.
