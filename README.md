@@ -87,12 +87,36 @@ Step 6: We exclude all individuals with a PI_HAT > 0.2 to remove cryptic related
 
 Step 1: ADNI datasets are often on older genome builds (e.g., hg18/NCBI36). Before imputation, convert to hg19/GRCh37. This ensures all datasets use the same genome coordinates, resulting in .bed/.bim/.fam files aligned to GRCh37. 
 ```
-
+# https://genviz.org/module-01-intro/0001/06/02/liftoverTools/
+# https://genome.sph.umich.edu/wiki/LiftOver
+# download the LiftOver from http://genome.ucsc.edu/cgi-bin/hgLiftOver
+# download chain file hg18ToHg19.over.chain.gz from http://hgdownload.cse.ucsc.edu/goldenpath/hg18/liftOver/
+# Download files from: https://martha-labbook.netlify.app/posts/converting-snp-array-data/
+> chmod a+x liftOver
+> sudo mv ~/Downloads/liftOver /usr/local/bin/
+> plink --bfile ADNI_cluster_01_forward_757LONI_10 --recode --tab --out ADNI_cluster_01_forward_757LONI_11
+> export SNP_path="/Users/taehyo/Library/CloudStorage/Dropbox/NYU/Research/Research/Data/data_l0ipls/GWAS/taehyo/scripts"
+> python $SNP_path/liftOverPlink-master/liftOverPlink.py --bin /usr/local/bin/liftOver --map ADNI_cluster_01_forward_757LONI_11.map --out ADNI_cluster_01_forward_757LONI_11_lifted --chain $SNP_path/hg18ToHg19.over.chain.gz
+> python $SNP_path/liftoverPlink-master/rmBadLifts.py --map ADNI_cluster_01_forward_757LONI_11_lifted.map --out ADNI_cluster_01_forward_757LONI_11_good_lifted.map --log ADNI_cluster_01_forward_757LONI_11_bad_lifted.dat
+> cut -f 2 ADNI_cluster_01_forward_757LONI_11_bad_lifted.dat > ADNI_cluster_01_forward_757LONI_11_snps_exclude.dat
+> cut -f 4 ADNI_cluster_01_forward_757LONI_11_lifted.bed.unlifted | sed "/^#/d" >> ADNI_cluster_01_forward_757LONI_11_snps_exclude.dat 
+> plink --file ADNI_cluster_01_forward_757LONI_11 --recode --out ADNI_cluster_01_forward_757LONI_12 --exclude ADNI_cluster_01_forward_757LONI_11_snps_exclude.dat
+> plink --ped ADNI_cluster_01_forward_757LONI_12.ped --map ADNI_cluster_01_forward_757LONI_11_good_lifted.map --recode --out ADNI_cluster_01_forward_757LONI_13
+> plink --file ADNI_cluster_01_forward_757LONI_13 --make-bed --out ADNI_cluster_01_forward_757LONI_14
+> plink --bfile ADNI_cluster_01_forward_757LONI_14 --recode vcf --out ADNI_cluster_01_forward_757LONI_14_vcf
+'''
+# Python code to heck if it has been lifted properly
+from snps import SNPs
+s = SNPs("ADNI_cluster_01_forward_757LONI_14_vcf.vcf")
+s.build
+s.build_detected
+s.assembly #'GRCh37'
+'''
 ```
 
 Step 2: Imputation via Michigan Imputation Server
 ```
-Code will go here
+
 ```
 
 ### Population Structure Modeling:
