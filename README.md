@@ -123,11 +123,42 @@ plink --bfile ADNI_cluster_01_forward_757LONI_14 --exclude duplicatedSNP.txt --m
 Step 3: Imputation via Michigan Imputation Server
 We will convert the plink data to vcf format, then use the MIS to impute data. 
 ```
+> wget http://www.well.ox.ac.uk/~wrayner/tools/HRC-1000G-check-bim-v4.3.0.zip
+> wget ftp://ngs.sanger.ac.uk/production/hrc/HRC.r1-1/HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
+> unzip HRC-1000G-check-bim-v4.3.0.zip
+> gunzip HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz 
+> plink --freq --bfile ADNI_cluster_01_forward_757LONI_15 --out ADNI_cluster_01_forward_757LONI_15.freq
+> perl $SNP_path/HRC-1000G-check-bim.pl -b ADNI_cluster_01_forward_757LONI_14.bim -f ADNI_cluster_01_forward_757LONI_14.freq.frq -r $SNP_path/HRC.r1-1.GRCh37.wgs.mac5.sites.tab -h
 
-```
+## Create a sorted vcf.gz file using BCFtools:
+# Download BCFtools (bcftools-1.14) from http://www.htslib.org/download/
+> cd bcftools-1.14    # and similarly for bcftools and htslib
+> ./configure --prefix=/Users/haishu/Applications/
+> make
+> make install
+> export PATH=/Users/taehyo/Applications/bin:$PATH```
+
+> for chr in {1..22}
+do
+	bcftools sort ADNI_cluster_01_forward_757LONI_15-updated-chr$chr.vcf -Oz -o ADNI_cluster_01_forward_757LONI_15-updated-chr$chr.vcf.gz
+done
+
+# Now upload to Michigan Imputation Server for imputation: https://imputationserver.sph.umich.edu/index.html#!pages/login
+
+> for chr in $(seq 1 22)
+do
+	unzip -P 2kFzKqy7lKa1GR chr_$chr.zip
+done
+
+> bcftools concat chr1.dose.vcf.gz chr2.dose.vcf.gz chr3.dose.vcf.gz chr4.dose.vcf.gz chr5.dose.vcf.gz chr6.dose.vcf.gz chr7.dose.vcf.gz chr8.dose.vcf.gz chr9.dose.vcf.gz chr10.dose.vcf.gz chr11.dose.vcf.gz chr12.dose.vcf.gz chr13.dose.vcf.gz chr14.dose.vcf.gz chr15.dose.vcf.gz chr16.dose.vcf.gz chr17.dose.vcf.gz chr18.dose.vcf.gz chr19.dose.vcf.gz chr20.dose.vcf.gz chr21.dose.vcf.gz chr22.dose.vcf.gz -Ou | 
+bcftools view -Ou -i 'R2>0.3' |
+bcftools annotate -Oz -x ID -I +'%CHROM:%POS:%REF:%ALT' -o ADNI1_allchromosomes.converted.R2_0.3.vcf.gz
+
+> plink --vcf ADNI1_allchromosomes.converted.R2_0.3.vcf.gz --double-id --make-bed --out ADNI1_allchromosomes.converted.R2_0.3
 
 ### Population Structure Modeling:
 
+I repeat the above steps for ADNI1, ADNI2, and ADNIGO. If you only have a single dataset, you can skip the below merge process. 
 (Optional): If you have multiple datasets, merge all of them now that they are aligned and imputed on the same genome build, followed by post-merge quality check. 
 ```
 Code will go here
