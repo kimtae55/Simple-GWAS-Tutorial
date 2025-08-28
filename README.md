@@ -19,23 +19,40 @@ In my case, I use Plink data (.bed, .bim, .fam files) downloaded from the ADNI1,
 ### Quality Control --> Liftover and Imputation --> Population Structure Modeling --> Associative Analysis 
 
 Quality Control is done at a sample-level (to remove bad individuals; e.g. contamination, swaps, relatedness, sex mismatches) and SNP-level (to remove bad variants; e.g. missingness, low MAF, HWE failures).
+If you have multiple datasets from different studies/timepoints, you should run this part separately, then merge the results (see the later optional step for merging)
 
 ### QC Steps:
 
 Step 1: Handle missingness per individual and per SNP: Delete individuals with missingness >0.05.
 ```
-Code will go here
+plink --bfile ADNI_cluster_01_forward_757LONI --missing 
+Rscript --no-save hist_miss.R
 ```
 
 Step 2: Handle sex discrepancy: Subjects who were a priori determined as females must have a F value of <0.2, and subjects who were a priori determined as males must have a F value >0.8. This F value is based on the X chromosome inbreeding (homozygosity) estimate. Subjects who do not fulfil these requirements are flagged "PROBLEM" by PLINK.
+```
+Code will go here
+```
 
 Step 3: Extract autosomal SNPs only and delete SNPs with a low minor allele frequency (MAF <0.01).
+```
+Code will go here
+```
 
 Step 4: Delete SNPs which are not in Hardy-Weinberg equilibrium (HWE).
+```
+Code will go here
+```
 
 Step 5: Remove individuals with a heterozygosity rate deviating more than 3 sd from the mean.
+```
+Code will go here
+```
 
 Step 6: We exclude all individuals with a PI_HAT > 0.2 to remove cryptic relatedness, assuming a random population sample.
+```
+Code will go here
+```
 
 ### Lifting and Imputation:
 
