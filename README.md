@@ -233,14 +233,29 @@ ADNI3   002_S_6066
 
 Step 1: Population stratification is corrected by extracting principal components (PCs) for each dataset separately using LD-pruned SNPs. The top PCs are used as covariates in GWAS to control for ancestry differences. 
 ```
-Code will go here
+> plink --bfile ADNI_cluster_01_forward_757LONI_14 --exclude range high-LD-regions-hg19-GRCh37.txt --indep-pairwise 50 5 0.2 --out pruned_data
+> plink --bfile ADNI_cluster_01_forward_757LONI_14 --extract pruned_data.prune.in --make-bed --out ADNI_cluster_01_forward_757LONI_14_pruned
+> plink --bfile ADNI_cluster_01_forward_757LONI_14_pruned --pca 10 --out ADNI1_PCA
+
+> plink --bfile ADNI_GO2_10 --exclude range high-LD-regions-hg19-GRCh37.txt --indep-pairwise 50 5 0.2 --out pruned_data
+> plink --bfile ADNI_GO2_10 --extract pruned_data.prune.in --make-bed --out ADNI_GO2_10_pruned
+> plink --bfile ADNI_GO2_10_pruned --pca 10 --out ADNIGO2_PCA
+
+> plink --bfile ADNI3_SNP_10 --exclude range high-LD-regions-hg19-GRCh37.txt --indep-pairwise 50 5 0.2 --out pruned_data
+> plink --bfile ADNI3_SNP_10 --extract pruned_data.prune.in --make-bed --out ADNI3_SNP_10_pruned
+> plink --bfile ADNI3_SNP_10_pruned --pca 10 --out ADNI3_PCA
 ```
 
 ### Associative Analysis:
 
 Run GWAS on progression (e.g. ADAS-Cog, MMSE)
 ```
-Code will go here
+# Modify below to fit your research question. 
+> Rscript subjects_bl_covar.R
+> plink --bfile ADNI1_GO2_3_merged_snps.R2_0.3.MAF_0.01.HWE_0.000001.geno_0.05.IBD_0.2 --keep ADNIall_ADandCN_subj.txt --make-bed --out ADNIall_ADandCN_1
+> plink --bfile ADNIall_ADandCN_2 --logistic hide-covar --covar ADNIall_ADandCN_covar.txt --allow-no-sex --out ADNIall_ADandCN_test_result
+> plink -bfile ADNIall_ADandCN_2 --extract sigSNPs.txt --make-bed --out ADNIall_ADandCN_3
+> plink --bfile ADNIall_ADandCN_3 --recodeA --out ADNIall_ADandCN_sigSNPs
 ```
 
 ## Application: Sparse Canoninical Correlation Analysis using Imaging-Omics (FDG-PET, SNP)
