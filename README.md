@@ -160,7 +160,8 @@ bcftools annotate -Oz -x ID -I +'%CHROM:%POS:%REF:%ALT' -o ADNI1_allchromosomes.
 ### Population Structure Modeling:
 
 I repeat the above steps for ADNI1, ADNI2, and ADNIGO. If you only have a single dataset, you can skip the below merge process. 
-(Optional): If you have multiple datasets, merge all of them now that they are aligned and imputed on the same genome build, followed by post-merge quality check. 
+
+(Optional Step): If you have multiple datasets, merge all of them now that they are aligned and imputed on the same genome build, followed by post-merge quality check. 
 
 
 Step 1: Population stratification is corrected by extracting principal components (PCs) for each dataset separately using LD-pruned SNPs. The top PCs are used as covariates in GWAS to control for ancestry differences. 
