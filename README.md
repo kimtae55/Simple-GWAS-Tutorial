@@ -58,19 +58,36 @@ Step 4: Delete SNPs which are not in Hardy-Weinberg equilibrium (HWE).
 
 Step 5: Remove individuals with a heterozygosity rate deviating more than 3 sd from the mean.
 ```
-
+> plink --bfile ADNI_cluster_01_forward_757LONI_7 --exclude range high-LD-regions-hg18-NCBI36.txt --indep-pairwise 50 5 0.2 --out indepSNP
+> plink --bfile ADNI_cluster_01_forward_757LONI_7 --extract indepSNP.prune.in --het --out R_check
+> Rscript --no-save check_heterozygosity_rate.R
+> Rscript --no-save heterozygosity_outliers_list.R # # Outputs fail-het-qc.txt
+> sed 's/"// g' fail-het-qc.txt | awk '{print$1, $2}'> het_fail_ind.txt
+> plink --bfile ADNI_cluster_01_forward_757LONI_7 --remove het_fail_ind.txt --make-bed --out ADNI_cluster_01_forward_757LONI_8 
 ```
 
 Step 6: We exclude all individuals with a PI_HAT > 0.2 to remove cryptic relatedness, assuming a random population sample.
 ```
-Code will go here
+> plink --bfile ADNI_cluster_01_forward_757LONI_8 --extract indepSNP.prune.in --genome --min 0.2 --out pihat_min0.2
+> awk '{ if ($8 >0.9) print $0 }' pihat_min0.2.genome>zoom_pihat.genome
+> Rscript --no-save Relatedness.R
+> plink --bfile ADNI_cluster_01_forward_757LONI_8 --filter-founders --make-bed --out ADNI_cluster_01_forward_757LONI_9
+> plink --bfile ADNI_cluster_01_forward_757LONI_9 --extract indepSNP.prune.in --genome --min 0.2 --out pihat_min0.2_in_founders
+> plink --bfile ADNI_cluster_01_forward_757LONI_9 --missing
+> plink --bfile ADNI_cluster_01_forward_757LONI_9 --missing --out ADNI_cluster_01_forward_757LONI_9
+> awk 'NR==FNR && FNR>1 {miss[$1" "$2]=$6; next} 
+     FNR>1 {a=$1" "$2; b=$3" "$4; fa=(a in miss?miss[a]:1.0); fb=(b in miss?miss[b]:1.0); 
+            if (fa>fb) print $1, $2; else print $3, $4}' 
+    ADNI_cluster_01_forward_757LONI_9.imiss pihat_min0.2_in_founders.genome 
+  | sort -u > remove_pihat0.2_lowcall.txt
+> plink --bfile ADNI_cluster_01_forward_757LONI_9 --remove remove_pihat0.2_lowcall.txt --make-bed --out ADNI_cluster_01_forward_757LONI_10
 ```
 
 ### Lifting and Imputation:
 
 Step 1: ADNI datasets are often on older genome builds (e.g., hg18/NCBI36). Before imputation, convert to hg19/GRCh37. This ensures all datasets use the same genome coordinates, resulting in .bed/.bim/.fam files aligned to GRCh37. 
 ```
-Code will go here
+
 ```
 
 Step 2: Imputation via Michigan Imputation Server
