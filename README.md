@@ -114,7 +114,14 @@ s.assembly #'GRCh37'
 '''
 ```
 
-Step 2: Imputation via Michigan Imputation Server
+Step 2: Check for duplicates
+```
+plink --bfile ADNI_cluster_01_forward_757LONI_14 --list-duplicate-vars 
+plink --bfile ADNI_cluster_01_forward_757LONI_14 --exclude duplicatedSNP.txt --make-bed --out ADNI_cluster_01_forward_757LONI_15
+```
+
+Step 3: Imputation via Michigan Imputation Server
+We will convert the plink data to vcf format, then use the MIS to impute data. 
 ```
 
 ```
