@@ -2,7 +2,7 @@
 This is a Step by Step Tutorial for GWAS (for Plink format), explaining what SNP data looks like, how to perform quality control and imputation procedures, and how to run GWAS.
 Credits for the figures and explanations here go to the more in-depth tutorials: [GWASTutorial](https://cloufield.github.io/GWASTutorial) or [doi: 10.1002/mpr.1608](https://pmc.ncbi.nlm.nih.gov/articles/PMC6001694/). The codes are taken from [https://github.com/MareesAT/GWA_tutorial](https://github.com/MareesAT/GWA_tutorial).
 
-I aggregate all components of GWAS into one repository, to clear the confusion of what to download and when/how to run certain scripts. This means that you can replace my data with your .bed, .bim, .fam files and replicate the whole experiment. 
+I aggregate all components of GWAS into one repository for study purposes, and to clear the confusion of what to download and when/how to run certain scripts. This means that you can replace my data with your .bed, .bim, .fam files and replicate the whole experiment. 
 
 The output is a genotype matrix of shape (n x p), where n is the number of subjects, and p is the number of SNPs extracted from GWAS. 
 
@@ -26,23 +26,31 @@ If you have multiple datasets from different studies/timepoints, you should run 
 Step 1: Handle missingness per individual and per SNP: Delete individuals with missingness >0.05.
 ```
 > plink --bfile ADNI_cluster_01_forward_757LONI --missing 
-> Rscript --no-save hist_miss.R
-> 
+> Rscript --no-save hist_miss.R # Visualize missingness
+> plink --bfile ADNI_cluster_01_forward_757LONI --geno 0.05 --make-bed --out ADNI_cluster_01_forward_757LONI_2
+> plink --bfile ADNI_cluster_01_forward_757LONI_2 --mind 0.05 --make-bed --out ADNI_cluster_01_forward_757LONI_3
 ```
 
 Step 2: Handle sex discrepancy: Subjects who were a priori determined as females must have a F value of <0.2, and subjects who were a priori determined as males must have a F value >0.8. This F value is based on the X chromosome inbreeding (homozygosity) estimate. Subjects who do not fulfil these requirements are flagged "PROBLEM" by PLINK.
 ```
-Code will go here
+> plink --bfile ADNI_cluster_01_forward_757LONI_3 --check-sex 
+> Rscript --no-save gender_check.R # Visualize sex dicrepancy check
+> grep "PROBLEM" plink.sexcheck| awk '{print$1,$2}'> sex_discrepancy.txt
+> plink --bfile ADNI_cluster_01_forward_757LONI_3 --remove sex_discrepancy.txt --make-bed --out ADNI_cluster_01_forward_757LONI_4 
 ```
 
 Step 3: Extract autosomal SNPs only and delete SNPs with a low minor allele frequency (MAF <0.01).
 ```
-Code will go here
+> awk '{ if ($1 >= 1 && $1 <= 22) print $2 }' ADNI_cluster_01_forward_757LONI_4.bim > snp_1_22.txt
+plink --bfile ADNI_cluster_01_forward_757LONI_4 --extract snp_1_22.txt --make-bed --out ADNI_cluster_01_forward_757LONI_5
+> plink --bfile ADNI_cluster_01_forward_757LONI_5 --freq --out MAF_check
+> Rscript --no-save MAF_check.R
+> plink --bfile ADNI_cluster_01_forward_757LONI_5 --maf 0.01 --make-bed --out ADNI_cluster_01_forward_757LONI_6
 ```
 
 Step 4: Delete SNPs which are not in Hardy-Weinberg equilibrium (HWE).
 ```
-Code will go here
+
 ```
 
 Step 5: Remove individuals with a heterozygosity rate deviating more than 3 sd from the mean.
