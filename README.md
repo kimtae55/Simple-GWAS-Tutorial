@@ -161,8 +161,75 @@ bcftools annotate -Oz -x ID -I +'%CHROM:%POS:%REF:%ALT' -o ADNI1_allchromosomes.
 
 I repeat the above steps for ADNI1, ADNI2, and ADNIGO. If you only have a single dataset, you can skip the below merge process. 
 
-(Optional Step): If you have multiple datasets, merge all of them now that they are aligned and imputed on the same genome build, followed by post-merge quality check. 
+(Optional Step): If you have multiple datasets, merge all of them now that they are aligned and imputed on the same genome build, followed by final post-merge quality check. 
+```
+# https://martha-labbook.netlify.app/posts/extracting-data-for-variants-common-in-both-file-sets/
+> awk '{print $2}' ADNI1_allchromosomes.converted.R2_0.3.bim | sort > ADNI1_snp_sorted.txt
+> awk '{print $2}' ADNIGO2_allchromosomes.converted.R2_0.3.bim | sort > ADNIGO2_snp_sorted.txt
+> awk '{print $2}' ADNI3_allchromosomes.converted.R2_0.3.bim | sort > ADNI3_snp_sorted.txt
 
+> comm -12 ADNI1_snp_sorted.txt ADNIGO2_snp_sorted.txt > intersect_ADNI1_GO2_snps.txt
+> comm -12 intersect_ADNI1_GO2_snps.txt ADNI3_snp_sorted.txt > intersect_ADNI1_GO2_3_snps.txt
+> wc -l intersect_ADNI1_GO2_3_snps.txt
+
+> plink --bfile /scratch/hs120/ADNI_SNP/ADNI1_SNP_QC/ADNI1_allchromosomes.converted.R2_0.3 --extract intersect_ADNI1_GO2_3_snps.txt --make-bed --out ADNI1_intersect_snps
+> plink --bfile /scratch/hs120/ADNI_SNP/ADNIGO2_SNP_QC/ADNIGO2_allchromosomes.converted.R2_0.3 --extract intersect_ADNI1_GO2_3_snps.txt --make-bed --out ADNIGO2_intersect_snps
+> plink --bfile /scratch/hs120/ADNI_SNP/ADNI3_SNP_QC/ADNI3_allchromosomes.converted.R2_0.3 --extract intersect_ADNI1_GO2_3_snps.txt --make-bed --out ADNI3_intersect_snps
+
+> plink --merge-list allfiles2merge.txt --make-bed --out ADNI1_GO2_3_merged_1
+> awk '{print $0, $1":"$4}' ADNI1_GO2_3_merged_1.bim > post_imputation_updated_positions
+> awk '{print $1":"$4}' ADNI1_GO2_3_merged_1.bim | sort | uniq -d > post_imputation_updated_duplicated_positions 
+> grep -w -f  post_imputation_updated_duplicated_positions post_imputation_updated_positions | awk '{print $2}' > post_imputation_updated_duplicated_IDs
+> plink --bfile ADNI1_GO2_3_merged_1 --exclude post_imputation_updated_duplicated_IDs --make-bed --out ADNI1_GO2_3_merged_2
+> plink --bfile ADNI1_GO2_3_merged_2 --snps-only --make-bed --out ADNI1_GO2_3_merged_snps
+
+# Post-QC
+> plink --bfile ADNI1_GO2_3_merged_snps --maf 0.01 --hwe 1e-6 --hwe-all --geno 0.05 --make-bed --out ADNI1_GO2_3_merged_snps.R2_0.3.MAF_0.01.HWE_0.000001.geno_0.05
+
+# Modify below file names and script to align with your data
+> Rscript subjects_relatedness.R
+> plink --bfile ADNI_cluster_01_forward_757LONI_14 --update-name ADNI1_snp_rename.txt --make-bed --out ADNI_cluster_01_forward_757LONI_14_renameID
+> plink --bfile ADNI_cluster_01_forward_757LONI_14_renameID --extract ADNI_common_snp.txt --make-bed --out ADNI1_commonSNP_data
+> plink --bfile ADNI_GO2_10 --update-name ADNIGO2_snp_rename.txt --make-bed --out ADNI_GO2_10_renameID
+> plink --bfile ADNI_GO2_10_renameID --extract /Users/haishu/Desktop/genetic_imaging/ADNI_data/ADNI_SNP/ADNI1_SNP_QC/ADNI_common_snp.txt --make-bed --out ADNIGO2_commonSNP_data
+> plink --bfile ADNI3_SNP_10 --update-name ADNI3_snp_rename.txt --make-bed --out ADNI3_SNP_10_renameID
+> plink --bfile ADNI3_SNP_10_renameID --extract /Users/haishu/Desktop/genetic_imaging/ADNI_data/ADNI_SNP/ADNI1_SNP_QC/ADNI_common_snp.txt --make-bed --out ADNI3_commonSNP_data
+> plink --merge-list allfiles2merge_CheckSubjectRelatedness.txt --make-bed --out ADNI1_GO2_3_merged_CheckSubjectRelatedness
+> plink --bfile ADNI1_GO2_3_merged_CheckSubjectRelatedness --exclude range high-LD-regions-hg19-GRCh37.txt --indep-pairwise 50 5 0.2 --out indepSNP_ADNIall_CheckSubjectRelatedness
+> plink --bfile ADNI1_GO2_3_merged_CheckSubjectRelatedness --filter-founders --make-bed --out ADNI1_GO2_3_merged_CheckSubjectRelatedness_2
+> plink --bfile ADNI1_GO2_3_merged_CheckSubjectRelatedness_2 --extract indepSNP_ADNIall_CheckSubjectRelatedness.prune.in --genome --min 0.2 --out pihat_min0.2_in_founders_ADNIall_CheckSubjectRelatedness
+> plink --bfile ADNI1_GO2_3_merged_CheckSubjectRelatedness_2 --missing
+# Generate a list of FID and IID of the individual(s) with a Pihat above 0.2, to check who had the lower call rate of the pair.
+#        81   024_S_4084          Y       48    84007 0.0005714
+#     ADNI3   024_S_6005          Y       51    84007 0.0006071
+
+
+#       118   023_S_4035          Y       36    84007 0.0004285
+#      591   023_S_0058          Y       15    84007 0.0001786
+
+
+#       179   012_S_4094          Y       37    84007 0.0004404
+#  ADNI3   002_S_6066          Y       67    84007 0.0007976
+
+
+#      342   137_S_4466          Y       62    84007 0.000738
+#     453   021_S_0159          Y       44    84007 0.0005238
+
+
+#      396   011_S_4235          Y       65    84007 0.0007737
+#    ADNI3   011_S_6303          Y       47    84007 0.0005595
+
+> nano 0.2_low_call_rate_pihat_ADNIall_CheckSubjectRelatedness.txt
+ADNI3   024_S_6005
+118   023_S_4035
+ADNI3   002_S_6066 
+342   137_S_4466
+396   011_S_4235 
+
+> plink --bfile ADNI1_GO2_3_merged_CheckSubjectRelatedness_2 --remove 0.2_low_call_rate_pihat_ADNIall_CheckSubjectRelatedness.txt --make-bed --out ADNI1_GO2_3_merged_CheckSubjectRelatedness_3
+> awk '{print $1"_"$2, $1"_"$2}' ADNI1_GO2_3_merged_CheckSubjectRelatedness_3.fam > ADNIall_CheckSubjectRelatedness_subj.txt 
+> plink --bfile ADNI1_GO2_3_merged_snps.R2_0.3.MAF_0.01.HWE_0.000001.geno_0.05 --keep ADNIall_CheckSubjectRelatedness_subj.txt --make-bed --out ADNI1_GO2_3_merged_snps.R2_0.3.MAF_0.01.HWE_0.000001.geno_0.05.IBD_0.2
+```
 
 Step 1: Population stratification is corrected by extracting principal components (PCs) for each dataset separately using LD-pruned SNPs. The top PCs are used as covariates in GWAS to control for ancestry differences. 
 ```
