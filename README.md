@@ -258,7 +258,7 @@ Run GWAS on progression (e.g. ADAS-Cog, MMSE)
 > plink --bfile ADNIall_ADandCN_3 --recodeA --out ADNIall_ADandCN_sigSNPs
 ```
 
-## Application: Sparse Canoninical Correlation Analysis using Imaging-Omics (FDG-PET, SNP)
+## Application: Sparse Canonical Correlation Analysis using Imaging-Omics (FDG-PET, SNP)
 
 Goal: To investigate how genetic variation (SNPs) and brain imaging features (FDG-PET ROIs) are related, and to assess how these associations change across disease stages (CN, MCI, AD). We use Sparse Canonical Correlation Analysis (SCCA) to identify low-dimensional, interpretable patterns linking high-dimensional SNP data with FDG-PET imaging phenotypes.
 
