@@ -249,6 +249,15 @@ Step 1: Population stratification is corrected by extracting principal component
 ### Associative Analysis:
 
 Run GWAS on progression (e.g. ADAS-Cog, MMSE)
+- dummy variables of adni cohort (adni1, adni2, adnigo)
+- gender, age
+- race, ethnicity, education, marital status, 10 PC
+- try to maintain 300-400 SNPs? make sure p >> n 
+- response variable should be logistic (CN or AD), each regression containing 1 SNP, use pvalue threshold to retain reasonable # of SNP
+- this is more straightforward to see rather than using other response variables
+- then, before SCCA, do linear regression (regress out the same covariates, and then i
+- check if our snp data contains SNP for APOE4 (double check)
+- for FDG PET, take the average across each ROI, then regress 
 ```
 # Modify below to fit your research question. 
 > Rscript subjects_bl_covar.R
