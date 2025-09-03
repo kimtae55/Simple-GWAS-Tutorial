@@ -51,7 +51,6 @@ Step 3: Extract autosomal SNPs only and delete SNPs with a low minor allele freq
 Step 4: Delete SNPs which are not in Hardy-Weinberg equilibrium (HWE).
 ```
 > plink2 --bfile ADNI_cluster_01_forward_757LONI_6 --hardy
-> awk '{ if ($9 <0.00001) print $0 }' plink.hwe>plinkzoomhwe.hwe
 > Rscript --no-save hwe.R
 > plink2 --bfile ADNI_cluster_01_forward_757LONI_6 --hwe 1e-6 --hwe-all --make-bed --out ADNI_cluster_01_forward_757LONI_7
 ```
