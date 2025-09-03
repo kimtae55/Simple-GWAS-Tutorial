@@ -25,62 +25,62 @@ If you have multiple datasets from different studies/timepoints, you should run 
 
 Step 1: Handle missingness per individual and per SNP: Delete individuals with missingness >0.05.
 ```
-> plink --bfile ADNI_cluster_01_forward_757LONI --missing 
+> plink2 --bfile ADNI_cluster_01_forward_757LONI --missing 
 > Rscript --no-save hist_miss.R # Visualize missingness
-> plink --bfile ADNI_cluster_01_forward_757LONI --geno 0.05 --make-bed --out ADNI_cluster_01_forward_757LONI_2
-> plink --bfile ADNI_cluster_01_forward_757LONI_2 --mind 0.05 --make-bed --out ADNI_cluster_01_forward_757LONI_3
+> plink2 --bfile ADNI_cluster_01_forward_757LONI --geno 0.05 --make-bed --out ADNI_cluster_01_forward_757LONI_2
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_2 --mind 0.05 --make-bed --out ADNI_cluster_01_forward_757LONI_3
 ```
 
 Step 2: Handle sex discrepancy: Subjects who were a priori determined as females must have a F value of <0.2, and subjects who were a priori determined as males must have a F value >0.8. This F value is based on the X chromosome inbreeding (homozygosity) estimate. Subjects who do not fulfil these requirements are flagged "PROBLEM" by PLINK.
 ```
-> plink --bfile ADNI_cluster_01_forward_757LONI_3 --check-sex 
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_3 --check-sex 
 > Rscript --no-save gender_check.R # Visualize sex dicrepancy check
 > grep "PROBLEM" plink.sexcheck| awk '{print$1,$2}'> sex_discrepancy.txt
-> plink --bfile ADNI_cluster_01_forward_757LONI_3 --remove sex_discrepancy.txt --make-bed --out ADNI_cluster_01_forward_757LONI_4 
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_3 --remove sex_discrepancy.txt --make-bed --out ADNI_cluster_01_forward_757LONI_4 
 ```
 
 Step 3: Extract autosomal SNPs only and delete SNPs with a low minor allele frequency (MAF <0.01).
 ```
 > awk '{ if ($1 >= 1 && $1 <= 22) print $2 }' ADNI_cluster_01_forward_757LONI_4.bim > snp_1_22.txt
 plink --bfile ADNI_cluster_01_forward_757LONI_4 --extract snp_1_22.txt --make-bed --out ADNI_cluster_01_forward_757LONI_5
-> plink --bfile ADNI_cluster_01_forward_757LONI_5 --freq --out MAF_check
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_5 --freq --out MAF_check
 > Rscript --no-save MAF_check.R
-> plink --bfile ADNI_cluster_01_forward_757LONI_5 --maf 0.01 --make-bed --out ADNI_cluster_01_forward_757LONI_6
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_5 --maf 0.01 --make-bed --out ADNI_cluster_01_forward_757LONI_6
 ```
 
 Step 4: Delete SNPs which are not in Hardy-Weinberg equilibrium (HWE).
 ```
-> plink --bfile ADNI_cluster_01_forward_757LONI_6 --hardy
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_6 --hardy
 > awk '{ if ($9 <0.00001) print $0 }' plink.hwe>plinkzoomhwe.hwe
 > Rscript --no-save hwe.R
-> plink --bfile ADNI_cluster_01_forward_757LONI_6 --hwe 1e-6 --hwe-all --make-bed --out ADNI_cluster_01_forward_757LONI_7
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_6 --hwe 1e-6 --hwe-all --make-bed --out ADNI_cluster_01_forward_757LONI_7
 ```
 
 Step 5: Remove individuals with a heterozygosity rate deviating more than 3 sd from the mean.
 ```
-> plink --bfile ADNI_cluster_01_forward_757LONI_7 --exclude range high-LD-regions-hg18-NCBI36.txt --indep-pairwise 50 5 0.2 --out indepSNP
-> plink --bfile ADNI_cluster_01_forward_757LONI_7 --extract indepSNP.prune.in --het --out R_check
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_7 --exclude range high-LD-regions-hg18-NCBI36.txt --indep-pairwise 50 5 0.2 --out indepSNP
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_7 --extract indepSNP.prune.in --het --out R_check
 > Rscript --no-save check_heterozygosity_rate.R
 > Rscript --no-save heterozygosity_outliers_list.R # # Outputs fail-het-qc.txt
 > sed 's/"// g' fail-het-qc.txt | awk '{print$1, $2}'> het_fail_ind.txt
-> plink --bfile ADNI_cluster_01_forward_757LONI_7 --remove het_fail_ind.txt --make-bed --out ADNI_cluster_01_forward_757LONI_8 
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_7 --remove het_fail_ind.txt --make-bed --out ADNI_cluster_01_forward_757LONI_8 
 ```
 
 Step 6: We exclude all individuals with a PI_HAT > 0.2 to remove cryptic relatedness, assuming a random population sample.
 ```
-> plink --bfile ADNI_cluster_01_forward_757LONI_8 --extract indepSNP.prune.in --genome --min 0.2 --out pihat_min0.2
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_8 --extract indepSNP.prune.in --genome --min 0.2 --out pihat_min0.2
 > awk '{ if ($8 >0.9) print $0 }' pihat_min0.2.genome>zoom_pihat.genome
 > Rscript --no-save Relatedness.R
-> plink --bfile ADNI_cluster_01_forward_757LONI_8 --filter-founders --make-bed --out ADNI_cluster_01_forward_757LONI_9
-> plink --bfile ADNI_cluster_01_forward_757LONI_9 --extract indepSNP.prune.in --genome --min 0.2 --out pihat_min0.2_in_founders
-> plink --bfile ADNI_cluster_01_forward_757LONI_9 --missing
-> plink --bfile ADNI_cluster_01_forward_757LONI_9 --missing --out ADNI_cluster_01_forward_757LONI_9
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_8 --filter-founders --make-bed --out ADNI_cluster_01_forward_757LONI_9
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_9 --extract indepSNP.prune.in --genome --min 0.2 --out pihat_min0.2_in_founders
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_9 --missing
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_9 --missing --out ADNI_cluster_01_forward_757LONI_9
 > awk 'NR==FNR && FNR>1 {miss[$1" "$2]=$6; next} 
      FNR>1 {a=$1" "$2; b=$3" "$4; fa=(a in miss?miss[a]:1.0); fb=(b in miss?miss[b]:1.0); 
             if (fa>fb) print $1, $2; else print $3, $4}' 
     ADNI_cluster_01_forward_757LONI_9.imiss pihat_min0.2_in_founders.genome 
   | sort -u > remove_pihat0.2_lowcall.txt
-> plink --bfile ADNI_cluster_01_forward_757LONI_9 --remove remove_pihat0.2_lowcall.txt --make-bed --out ADNI_cluster_01_forward_757LONI_10
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_9 --remove remove_pihat0.2_lowcall.txt --make-bed --out ADNI_cluster_01_forward_757LONI_10
 ```
 
 ### Lifting and Imputation:
@@ -94,16 +94,16 @@ Step 1: ADNI datasets are often on older genome builds (e.g., hg18/NCBI36). Befo
 # Download files from: https://martha-labbook.netlify.app/posts/converting-snp-array-data/
 > chmod a+x liftOver
 > sudo mv ~/Downloads/liftOver /usr/local/bin/
-> plink --bfile ADNI_cluster_01_forward_757LONI_10 --recode --tab --out ADNI_cluster_01_forward_757LONI_11
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_10 --recode --tab --out ADNI_cluster_01_forward_757LONI_11
 > export SNP_path="/Users/taehyo/Library/CloudStorage/Dropbox/NYU/Research/Research/Data/data_l0ipls/GWAS/taehyo/scripts"
 > python $SNP_path/liftOverPlink-master/liftOverPlink.py --bin /usr/local/bin/liftOver --map ADNI_cluster_01_forward_757LONI_11.map --out ADNI_cluster_01_forward_757LONI_11_lifted --chain $SNP_path/hg18ToHg19.over.chain.gz
 > python $SNP_path/liftoverPlink-master/rmBadLifts.py --map ADNI_cluster_01_forward_757LONI_11_lifted.map --out ADNI_cluster_01_forward_757LONI_11_good_lifted.map --log ADNI_cluster_01_forward_757LONI_11_bad_lifted.dat
 > cut -f 2 ADNI_cluster_01_forward_757LONI_11_bad_lifted.dat > ADNI_cluster_01_forward_757LONI_11_snps_exclude.dat
 > cut -f 4 ADNI_cluster_01_forward_757LONI_11_lifted.bed.unlifted | sed "/^#/d" >> ADNI_cluster_01_forward_757LONI_11_snps_exclude.dat 
-> plink --file ADNI_cluster_01_forward_757LONI_11 --recode --out ADNI_cluster_01_forward_757LONI_12 --exclude ADNI_cluster_01_forward_757LONI_11_snps_exclude.dat
-> plink --ped ADNI_cluster_01_forward_757LONI_12.ped --map ADNI_cluster_01_forward_757LONI_11_good_lifted.map --recode --out ADNI_cluster_01_forward_757LONI_13
-> plink --file ADNI_cluster_01_forward_757LONI_13 --make-bed --out ADNI_cluster_01_forward_757LONI_14
-> plink --bfile ADNI_cluster_01_forward_757LONI_14 --recode vcf --out ADNI_cluster_01_forward_757LONI_14_vcf
+> plink2 --file ADNI_cluster_01_forward_757LONI_11 --recode --out ADNI_cluster_01_forward_757LONI_12 --exclude ADNI_cluster_01_forward_757LONI_11_snps_exclude.dat
+> plink2 --ped ADNI_cluster_01_forward_757LONI_12.ped --map ADNI_cluster_01_forward_757LONI_11_good_lifted.map --recode --out ADNI_cluster_01_forward_757LONI_13
+> plink2 --file ADNI_cluster_01_forward_757LONI_13 --make-bed --out ADNI_cluster_01_forward_757LONI_14
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_14 --recode vcf --out ADNI_cluster_01_forward_757LONI_14_vcf
 '''
 # Python code to heck if it has been lifted properly
 from snps import SNPs
@@ -127,7 +127,7 @@ We will convert the plink data to vcf format, then use the MIS to impute data.
 > wget ftp://ngs.sanger.ac.uk/production/hrc/HRC.r1-1/HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
 > unzip HRC-1000G-check-bim-v4.3.0.zip
 > gunzip HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz 
-> plink --freq --bfile ADNI_cluster_01_forward_757LONI_15 --out ADNI_cluster_01_forward_757LONI_15.freq
+> plink2 --freq --bfile ADNI_cluster_01_forward_757LONI_15 --out ADNI_cluster_01_forward_757LONI_15.freq
 > perl $SNP_path/HRC-1000G-check-bim.pl -b ADNI_cluster_01_forward_757LONI_14.bim -f ADNI_cluster_01_forward_757LONI_14.freq.frq -r $SNP_path/HRC.r1-1.GRCh37.wgs.mac5.sites.tab -h
 
 ## Create a sorted vcf.gz file using BCFtools:
@@ -154,7 +154,7 @@ done
 bcftools view -Ou -i 'R2>0.3' |
 bcftools annotate -Oz -x ID -I +'%CHROM:%POS:%REF:%ALT' -o ADNI1_allchromosomes.converted.R2_0.3.vcf.gz
 
-> plink --vcf ADNI1_allchromosomes.converted.R2_0.3.vcf.gz --double-id --make-bed --out ADNI1_allchromosomes.converted.R2_0.3
+> plink2 --vcf ADNI1_allchromosomes.converted.R2_0.3.vcf.gz --double-id --make-bed --out ADNI1_allchromosomes.converted.R2_0.3
 ```
 
 ### Population Structure Modeling:
@@ -172,33 +172,33 @@ I repeat the above steps for ADNI1, ADNI2, and ADNIGO. If you only have a single
 > comm -12 intersect_ADNI1_GO2_snps.txt ADNI3_snp_sorted.txt > intersect_ADNI1_GO2_3_snps.txt
 > wc -l intersect_ADNI1_GO2_3_snps.txt
 
-> plink --bfile /scratch/hs120/ADNI_SNP/ADNI1_SNP_QC/ADNI1_allchromosomes.converted.R2_0.3 --extract intersect_ADNI1_GO2_3_snps.txt --make-bed --out ADNI1_intersect_snps
-> plink --bfile /scratch/hs120/ADNI_SNP/ADNIGO2_SNP_QC/ADNIGO2_allchromosomes.converted.R2_0.3 --extract intersect_ADNI1_GO2_3_snps.txt --make-bed --out ADNIGO2_intersect_snps
-> plink --bfile /scratch/hs120/ADNI_SNP/ADNI3_SNP_QC/ADNI3_allchromosomes.converted.R2_0.3 --extract intersect_ADNI1_GO2_3_snps.txt --make-bed --out ADNI3_intersect_snps
+> plink2 --bfile /scratch/hs120/ADNI_SNP/ADNI1_SNP_QC/ADNI1_allchromosomes.converted.R2_0.3 --extract intersect_ADNI1_GO2_3_snps.txt --make-bed --out ADNI1_intersect_snps
+> plink2 --bfile /scratch/hs120/ADNI_SNP/ADNIGO2_SNP_QC/ADNIGO2_allchromosomes.converted.R2_0.3 --extract intersect_ADNI1_GO2_3_snps.txt --make-bed --out ADNIGO2_intersect_snps
+> plink2 --bfile /scratch/hs120/ADNI_SNP/ADNI3_SNP_QC/ADNI3_allchromosomes.converted.R2_0.3 --extract intersect_ADNI1_GO2_3_snps.txt --make-bed --out ADNI3_intersect_snps
 
-> plink --merge-list allfiles2merge.txt --make-bed --out ADNI1_GO2_3_merged_1
+> plink2 --merge-list allfiles2merge.txt --make-bed --out ADNI1_GO2_3_merged_1
 > awk '{print $0, $1":"$4}' ADNI1_GO2_3_merged_1.bim > post_imputation_updated_positions
 > awk '{print $1":"$4}' ADNI1_GO2_3_merged_1.bim | sort | uniq -d > post_imputation_updated_duplicated_positions 
 > grep -w -f  post_imputation_updated_duplicated_positions post_imputation_updated_positions | awk '{print $2}' > post_imputation_updated_duplicated_IDs
-> plink --bfile ADNI1_GO2_3_merged_1 --exclude post_imputation_updated_duplicated_IDs --make-bed --out ADNI1_GO2_3_merged_2
-> plink --bfile ADNI1_GO2_3_merged_2 --snps-only --make-bed --out ADNI1_GO2_3_merged_snps
+> plink2 --bfile ADNI1_GO2_3_merged_1 --exclude post_imputation_updated_duplicated_IDs --make-bed --out ADNI1_GO2_3_merged_2
+> plink2 --bfile ADNI1_GO2_3_merged_2 --snps-only --make-bed --out ADNI1_GO2_3_merged_snps
 
 # Post-QC
-> plink --bfile ADNI1_GO2_3_merged_snps --maf 0.01 --hwe 1e-6 --hwe-all --geno 0.05 --make-bed --out ADNI1_GO2_3_merged_snps.R2_0.3.MAF_0.01.HWE_0.000001.geno_0.05
+> plink2 --bfile ADNI1_GO2_3_merged_snps --maf 0.01 --hwe 1e-6 --hwe-all --geno 0.05 --make-bed --out ADNI1_GO2_3_merged_snps.R2_0.3.MAF_0.01.HWE_0.000001.geno_0.05
 
 # Modify below file names and script to align with your data
 > Rscript subjects_relatedness.R
-> plink --bfile ADNI_cluster_01_forward_757LONI_14 --update-name ADNI1_snp_rename.txt --make-bed --out ADNI_cluster_01_forward_757LONI_14_renameID
-> plink --bfile ADNI_cluster_01_forward_757LONI_14_renameID --extract ADNI_common_snp.txt --make-bed --out ADNI1_commonSNP_data
-> plink --bfile ADNI_GO2_10 --update-name ADNIGO2_snp_rename.txt --make-bed --out ADNI_GO2_10_renameID
-> plink --bfile ADNI_GO2_10_renameID --extract /Users/haishu/Desktop/genetic_imaging/ADNI_data/ADNI_SNP/ADNI1_SNP_QC/ADNI_common_snp.txt --make-bed --out ADNIGO2_commonSNP_data
-> plink --bfile ADNI3_SNP_10 --update-name ADNI3_snp_rename.txt --make-bed --out ADNI3_SNP_10_renameID
-> plink --bfile ADNI3_SNP_10_renameID --extract /Users/haishu/Desktop/genetic_imaging/ADNI_data/ADNI_SNP/ADNI1_SNP_QC/ADNI_common_snp.txt --make-bed --out ADNI3_commonSNP_data
-> plink --merge-list allfiles2merge_CheckSubjectRelatedness.txt --make-bed --out ADNI1_GO2_3_merged_CheckSubjectRelatedness
-> plink --bfile ADNI1_GO2_3_merged_CheckSubjectRelatedness --exclude range high-LD-regions-hg19-GRCh37.txt --indep-pairwise 50 5 0.2 --out indepSNP_ADNIall_CheckSubjectRelatedness
-> plink --bfile ADNI1_GO2_3_merged_CheckSubjectRelatedness --filter-founders --make-bed --out ADNI1_GO2_3_merged_CheckSubjectRelatedness_2
-> plink --bfile ADNI1_GO2_3_merged_CheckSubjectRelatedness_2 --extract indepSNP_ADNIall_CheckSubjectRelatedness.prune.in --genome --min 0.2 --out pihat_min0.2_in_founders_ADNIall_CheckSubjectRelatedness
-> plink --bfile ADNI1_GO2_3_merged_CheckSubjectRelatedness_2 --missing
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_14 --update-name ADNI1_snp_rename.txt --make-bed --out ADNI_cluster_01_forward_757LONI_14_renameID
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_14_renameID --extract ADNI_common_snp.txt --make-bed --out ADNI1_commonSNP_data
+> plink2 --bfile ADNI_GO2_10 --update-name ADNIGO2_snp_rename.txt --make-bed --out ADNI_GO2_10_renameID
+> plink2 --bfile ADNI_GO2_10_renameID --extract /Users/haishu/Desktop/genetic_imaging/ADNI_data/ADNI_SNP/ADNI1_SNP_QC/ADNI_common_snp.txt --make-bed --out ADNIGO2_commonSNP_data
+> plink2 --bfile ADNI3_SNP_10 --update-name ADNI3_snp_rename.txt --make-bed --out ADNI3_SNP_10_renameID
+> plink2 --bfile ADNI3_SNP_10_renameID --extract /Users/haishu/Desktop/genetic_imaging/ADNI_data/ADNI_SNP/ADNI1_SNP_QC/ADNI_common_snp.txt --make-bed --out ADNI3_commonSNP_data
+> plink2 --merge-list allfiles2merge_CheckSubjectRelatedness.txt --make-bed --out ADNI1_GO2_3_merged_CheckSubjectRelatedness
+> plink2 --bfile ADNI1_GO2_3_merged_CheckSubjectRelatedness --exclude range high-LD-regions-hg19-GRCh37.txt --indep-pairwise 50 5 0.2 --out indepSNP_ADNIall_CheckSubjectRelatedness
+> plink2 --bfile ADNI1_GO2_3_merged_CheckSubjectRelatedness --filter-founders --make-bed --out ADNI1_GO2_3_merged_CheckSubjectRelatedness_2
+> plink2 --bfile ADNI1_GO2_3_merged_CheckSubjectRelatedness_2 --extract indepSNP_ADNIall_CheckSubjectRelatedness.prune.in --genome --min 0.2 --out pihat_min0.2_in_founders_ADNIall_CheckSubjectRelatedness
+> plink2 --bfile ADNI1_GO2_3_merged_CheckSubjectRelatedness_2 --missing
 # Generate a list of FID and IID of the individual(s) with a Pihat above 0.2, to check who had the lower call rate of the pair.
 #        81   024_S_4084          Y       48    84007 0.0005714
 #     ADNI3   024_S_6005          Y       51    84007 0.0006071
@@ -226,24 +226,24 @@ ADNI3   002_S_6066
 342   137_S_4466
 396   011_S_4235 
 
-> plink --bfile ADNI1_GO2_3_merged_CheckSubjectRelatedness_2 --remove 0.2_low_call_rate_pihat_ADNIall_CheckSubjectRelatedness.txt --make-bed --out ADNI1_GO2_3_merged_CheckSubjectRelatedness_3
+> plink2 --bfile ADNI1_GO2_3_merged_CheckSubjectRelatedness_2 --remove 0.2_low_call_rate_pihat_ADNIall_CheckSubjectRelatedness.txt --make-bed --out ADNI1_GO2_3_merged_CheckSubjectRelatedness_3
 > awk '{print $1"_"$2, $1"_"$2}' ADNI1_GO2_3_merged_CheckSubjectRelatedness_3.fam > ADNIall_CheckSubjectRelatedness_subj.txt 
-> plink --bfile ADNI1_GO2_3_merged_snps.R2_0.3.MAF_0.01.HWE_0.000001.geno_0.05 --keep ADNIall_CheckSubjectRelatedness_subj.txt --make-bed --out ADNI1_GO2_3_merged_snps.R2_0.3.MAF_0.01.HWE_0.000001.geno_0.05.IBD_0.2
+> plink2 --bfile ADNI1_GO2_3_merged_snps.R2_0.3.MAF_0.01.HWE_0.000001.geno_0.05 --keep ADNIall_CheckSubjectRelatedness_subj.txt --make-bed --out ADNI1_GO2_3_merged_snps.R2_0.3.MAF_0.01.HWE_0.000001.geno_0.05.IBD_0.2
 ```
 
 Step 1: Population stratification is corrected by extracting principal components (PCs) for each dataset separately using LD-pruned SNPs. The top PCs are used as covariates in GWAS to control for ancestry differences. 
 ```
-> plink --bfile ADNI_cluster_01_forward_757LONI_14 --exclude range high-LD-regions-hg19-GRCh37.txt --indep-pairwise 50 5 0.2 --out pruned_data
-> plink --bfile ADNI_cluster_01_forward_757LONI_14 --extract pruned_data.prune.in --make-bed --out ADNI_cluster_01_forward_757LONI_14_pruned
-> plink --bfile ADNI_cluster_01_forward_757LONI_14_pruned --pca 10 --out ADNI1_PCA
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_14 --exclude range high-LD-regions-hg19-GRCh37.txt --indep-pairwise 50 5 0.2 --out pruned_data
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_14 --extract pruned_data.prune.in --make-bed --out ADNI_cluster_01_forward_757LONI_14_pruned
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_14_pruned --pca 10 --out ADNI1_PCA
 
-> plink --bfile ADNI_GO2_10 --exclude range high-LD-regions-hg19-GRCh37.txt --indep-pairwise 50 5 0.2 --out pruned_data
-> plink --bfile ADNI_GO2_10 --extract pruned_data.prune.in --make-bed --out ADNI_GO2_10_pruned
-> plink --bfile ADNI_GO2_10_pruned --pca 10 --out ADNIGO2_PCA
+> plink2 --bfile ADNI_GO2_10 --exclude range high-LD-regions-hg19-GRCh37.txt --indep-pairwise 50 5 0.2 --out pruned_data
+> plink2 --bfile ADNI_GO2_10 --extract pruned_data.prune.in --make-bed --out ADNI_GO2_10_pruned
+> plink2 --bfile ADNI_GO2_10_pruned --pca 10 --out ADNIGO2_PCA
 
-> plink --bfile ADNI3_SNP_10 --exclude range high-LD-regions-hg19-GRCh37.txt --indep-pairwise 50 5 0.2 --out pruned_data
-> plink --bfile ADNI3_SNP_10 --extract pruned_data.prune.in --make-bed --out ADNI3_SNP_10_pruned
-> plink --bfile ADNI3_SNP_10_pruned --pca 10 --out ADNI3_PCA
+> plink2 --bfile ADNI3_SNP_10 --exclude range high-LD-regions-hg19-GRCh37.txt --indep-pairwise 50 5 0.2 --out pruned_data
+> plink2 --bfile ADNI3_SNP_10 --extract pruned_data.prune.in --make-bed --out ADNI3_SNP_10_pruned
+> plink2 --bfile ADNI3_SNP_10_pruned --pca 10 --out ADNI3_PCA
 ```
 
 ### Associative Analysis:
@@ -261,10 +261,10 @@ Run GWAS on progression (e.g. ADAS-Cog, MMSE)
 ```
 # Modify below to fit your research question. 
 > Rscript subjects_bl_covar.R
-> plink --bfile ADNI1_GO2_3_merged_snps.R2_0.3.MAF_0.01.HWE_0.000001.geno_0.05.IBD_0.2 --keep ADNIall_ADandCN_subj.txt --make-bed --out ADNIall_ADandCN_1
-> plink --bfile ADNIall_ADandCN_2 --logistic hide-covar --covar ADNIall_ADandCN_covar.txt --allow-no-sex --out ADNIall_ADandCN_test_result
-> plink -bfile ADNIall_ADandCN_2 --extract sigSNPs.txt --make-bed --out ADNIall_ADandCN_3
-> plink --bfile ADNIall_ADandCN_3 --recodeA --out ADNIall_ADandCN_sigSNPs
+> plink2 --bfile ADNI1_GO2_3_merged_snps.R2_0.3.MAF_0.01.HWE_0.000001.geno_0.05.IBD_0.2 --keep ADNIall_ADandCN_subj.txt --make-bed --out ADNIall_ADandCN_1
+> plink2 --bfile ADNIall_ADandCN_2 --logistic hide-covar --covar ADNIall_ADandCN_covar.txt --allow-no-sex --out ADNIall_ADandCN_test_result
+> plink2 -bfile ADNIall_ADandCN_2 --extract sigSNPs.txt --make-bed --out ADNIall_ADandCN_3
+> plink2 --bfile ADNIall_ADandCN_3 --recodeA --out ADNIall_ADandCN_sigSNPs
 ```
 
 ## Application: Sparse Canonical Correlation Analysis using Imaging-Omics (FDG-PET, SNP)
