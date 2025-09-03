@@ -60,8 +60,6 @@ Step 5: Remove individuals with a heterozygosity rate deviating more than 3 sd f
 > plink2 --bfile ADNI_cluster_01_forward_757LONI_7 --exclude range high-LD-regions-hg18-NCBI36.txt --indep-pairwise 50 5 0.2 --out indepSNP
 > plink2 --bfile ADNI_cluster_01_forward_757LONI_7 --extract indepSNP.prune.in --het --out R_check
 > Rscript --no-save check_heterozygosity_rate.R
-> Rscript --no-save heterozygosity_outliers_list.R # # Outputs fail-het-qc.txt
-> sed 's/"// g' fail-het-qc.txt | awk '{print$1, $2}'> het_fail_ind.txt
 > plink2 --bfile ADNI_cluster_01_forward_757LONI_7 --remove het_fail_ind.txt --make-bed --out ADNI_cluster_01_forward_757LONI_8 
 ```
 
