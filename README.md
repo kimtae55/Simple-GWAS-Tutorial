@@ -65,19 +65,8 @@ Step 5: Remove individuals with a heterozygosity rate deviating more than 3 sd f
 
 Step 6: We exclude all individuals with a PI_HAT > 0.2 to remove cryptic relatedness, assuming a random population sample.
 ```
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_8 --extract indepSNP.prune.in --genome --min 0.2 --out pihat_min0.2
-> awk '{ if ($8 >0.9) print $0 }' pihat_min0.2.genome>zoom_pihat.genome
-> Rscript --no-save Relatedness.R
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_8 --filter-founders --make-bed --out ADNI_cluster_01_forward_757LONI_9
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_9 --extract indepSNP.prune.in --genome --min 0.2 --out pihat_min0.2_in_founders
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_9 --missing
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_9 --missing --out ADNI_cluster_01_forward_757LONI_9
-> awk 'NR==FNR && FNR>1 {miss[$1" "$2]=$6; next} 
-     FNR>1 {a=$1" "$2; b=$3" "$4; fa=(a in miss?miss[a]:1.0); fb=(b in miss?miss[b]:1.0); 
-            if (fa>fb) print $1, $2; else print $3, $4}' 
-    ADNI_cluster_01_forward_757LONI_9.imiss pihat_min0.2_in_founders.genome 
-  | sort -u > remove_pihat0.2_lowcall.txt
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_9 --remove remove_pihat0.2_lowcall.txt --make-bed --out ADNI_cluster_01_forward_757LONI_10
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_8 --indep-pairwise 200 100 0.1 --out indepSNP
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_8 --extract indepSNP.prune.in --king-cutoff 0.10 --make-bed --out ADNI_cluster_01_forward_757LONI_10
 ```
 
 ### Lifting and Imputation:
