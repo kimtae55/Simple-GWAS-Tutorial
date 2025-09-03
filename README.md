@@ -52,7 +52,7 @@ Step 4: Delete SNPs which are not in Hardy-Weinberg equilibrium (HWE).
 ```
 > plink2 --bfile ADNI_cluster_01_forward_757LONI_6 --hardy
 > Rscript --no-save hwe.R
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_6 --hwe 1e-6 --hwe-all --make-bed --out ADNI_cluster_01_forward_757LONI_7
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_6 --hwe 1e-6 --make-bed --out ADNI_cluster_01_forward_757LONI_7
 ```
 
 Step 5: Remove individuals with a heterozygosity rate deviating more than 3 sd from the mean.
