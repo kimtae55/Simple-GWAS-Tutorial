@@ -35,14 +35,14 @@ Step 2: Handle sex discrepancy: Subjects who were a priori determined as females
 ```
 > plink2 --bfile ADNI_cluster_01_forward_757LONI_3 --check-sex 
 > Rscript --no-save gender_check.R # Visualize sex dicrepancy check
-> grep "PROBLEM" plink.sexcheck| awk '{print$1,$2}'> sex_discrepancy.txt
+> grep "PROBLEM" plink2.sexcheck| awk '{print$1,$2}'> sex_discrepancy.txt
 > plink2 --bfile ADNI_cluster_01_forward_757LONI_3 --remove sex_discrepancy.txt --make-bed --out ADNI_cluster_01_forward_757LONI_4 
 ```
 
 Step 3: Extract autosomal SNPs only and delete SNPs with a low minor allele frequency (MAF <0.01).
 ```
 > awk '{ if ($1 >= 1 && $1 <= 22) print $2 }' ADNI_cluster_01_forward_757LONI_4.bim > snp_1_22.txt
-plink --bfile ADNI_cluster_01_forward_757LONI_4 --extract snp_1_22.txt --make-bed --out ADNI_cluster_01_forward_757LONI_5
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_4 --extract snp_1_22.txt --make-bed --out ADNI_cluster_01_forward_757LONI_5
 > plink2 --bfile ADNI_cluster_01_forward_757LONI_5 --freq --out MAF_check
 > Rscript --no-save MAF_check.R
 > plink2 --bfile ADNI_cluster_01_forward_757LONI_5 --maf 0.01 --make-bed --out ADNI_cluster_01_forward_757LONI_6
