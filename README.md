@@ -109,10 +109,10 @@ plink --bfile ADNI_cluster_01_forward_757LONI_14 --exclude duplicatedSNP.txt --m
 Step 3: Imputation via Michigan Imputation Server
 We will convert the plink data to vcf format, then use the MIS to impute data. 
 ```
-> wget http://www.well.ox.ac.uk/~wrayner/tools/HRC-1000G-check-bim-v4.3.0.zip
-> wget ftp://ngs.sanger.ac.uk/production/hrc/HRC.r1-1/HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
-> unzip HRC-1000G-check-bim-v4.3.0.zip
-> gunzip HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz 
+> curl -L -O https://www.well.ox.ac.uk/~wrayner/tools/HRC-1000G-check-bim-v4.3.0.zip
+> unzip -o HRC-1000G-check-bim-v4.3.0.zip
+> curl -L -O https://ngs.sanger.ac.uk/production/hrc/HRC.r1-1/HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
+> gunzip -f HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
 > plink2 --freq --bfile ADNI_cluster_01_forward_757LONI_15 --out ADNI_cluster_01_forward_757LONI_15.freq
 > perl $SNP_path/HRC-1000G-check-bim.pl -b ADNI_cluster_01_forward_757LONI_14.bim -f ADNI_cluster_01_forward_757LONI_14.freq.frq -r $SNP_path/HRC.r1-1.GRCh37.wgs.mac5.sites.tab -h
 
