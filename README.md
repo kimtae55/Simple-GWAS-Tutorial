@@ -4,7 +4,7 @@ Credits for the figures and explanations here go to the more in-depth tutorials:
 
 I aggregate all components of GWAS into one repository for study purposes, and to clear the confusion of what to download and when/how to run certain scripts. This means that you can replace my data with your .bed, .bim, .fam files and replicate the whole experiment. 
 
-The output is a genotype matrix of shape (n x p), where n is the number of subjects, and p is the number of SNPs extracted from GWAS. 
+The output is a genotype matrix of shape (n x p), where n is the number of subjects, and p is the number of SNPs extracted from GWAS. At the end of the tutorial is an application example of how one can utilize the processed SNP data.
 
 ## Prerequisites
 You need to have the following installed: ```plink/plink2, R ```
