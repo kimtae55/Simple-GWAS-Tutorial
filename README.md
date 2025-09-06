@@ -7,7 +7,7 @@ I aggregate all components of GWAS into one repository for study purposes, and t
 The output is a genotype matrix of shape (n x p), where n is the number of subjects, and p is the number of SNPs extracted from GWAS. At the end of the tutorial is an application example of how one can utilize the processed SNP data.
 
 ## Prerequisites
-You need to have the following installed: ```plink/plink2, R ```
+You need to have the following installed: ```plink2, R```
 
 ## Assumption: You have SNP data in PLINK format
 <img src="https://github.com/kimtae55/GWAS-End-to-End-Tutorial/blob/main/figs/plink.png" width="600">
