@@ -69,7 +69,7 @@ Step 6: We exclude all individuals with a PI_HAT > 0.2 to remove cryptic related
 > plink2 --bfile ADNI_cluster_01_forward_757LONI_8 --extract indepSNP.prune.in --king-cutoff 0.10 --make-bed --out ADNI_cluster_01_forward_757LONI_10
 ```
 
-### Lifting and Imputation:
+### Liftover and Imputation:
 
 Step 1: ADNI datasets are often on older genome builds (e.g., hg18/NCBI36). Before imputation, convert to hg19/GRCh37. This ensures all datasets use the same genome coordinates, resulting in .bed/.bim/.fam files aligned to GRCh37. 
 ```
@@ -106,7 +106,11 @@ plink --bfile ADNI_cluster_01_forward_757LONI_14 --list-duplicate-vars
 plink --bfile ADNI_cluster_01_forward_757LONI_14 --exclude duplicatedSNP.txt --make-bed --out ADNI_cluster_01_forward_757LONI_15
 ```
 
-Step 3: Imputation via Michigan Imputation Server
+Step 3: Population stratification to identify correct reference panel 
+```
+```
+
+Step 4: Imputation via Michigan Imputation Server
 We will convert the plink data to vcf format, then use the MIS to impute data. 
 ```
 > curl -L -O https://www.well.ox.ac.uk/~wrayner/tools/HRC-1000G-check-bim-v4.3.0.zip
