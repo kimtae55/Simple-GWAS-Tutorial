@@ -126,6 +126,10 @@ Since I had no duplicates, I proceed with ADNI_cluster_01_forward_757LONI_12.
 
 Step 3: Population stratification to identify correct reference panel 
 ```
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_12 --chr 1-22 --exclude range high-LD-regions-hg19-GRCh37.txt --indep-pairwise 200 50 0.2 --out preimp
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_12 --extract preimp.prune.in --make-bed --out preimp.pruned_all
+> plink2 --bfile preimp.pruned_all --pca 10 approx --out preimp.pca_all_direct
+> Rscript pca_ref_panel_check.R  
 ```
 
 Step 4: Imputation via Michigan Imputation Server
