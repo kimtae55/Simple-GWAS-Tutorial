@@ -112,11 +112,12 @@ print("Build detected:", s.build_detected)
 PY
 ```
 
-Step 2: Check for duplicates
+Step 2: Check for duplicates (use ADNI_cluster_01_forward_757LONI_12 if no duplicates, otherwise proceed with ADNI_cluster_01_forward_757LONI_13)
 ```
-plink --bfile ADNI_cluster_01_forward_757LONI_14 --list-duplicate-vars 
-plink --bfile ADNI_cluster_01_forward_757LONI_14 --exclude duplicatedSNP.txt --make-bed --out ADNI_cluster_01_forward_757LONI_15
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_12 --set-all-var-ids @:#:\$r:\$a --make-bed --out ADNI_cluster_01_forward_757LONI_12_tmp
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_12_tmp --rm-dup exclude-all --make-bed --out ADNI_cluster_01_forward_757LONI_13
 ```
+Since I had no duplicates, I proceed with ADNI_cluster_01_forward_757LONI_12.
 
 Step 3: Population stratification to identify correct reference panel 
 ```
