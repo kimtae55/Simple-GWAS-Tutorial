@@ -84,7 +84,12 @@ print("assembly:", s.assembly, "build_detected:", s.build_detected)
 PY
 # Convert plink data to txt .bed, since the tool takes in a different format:
 > awk 'BEGIN{OFS="\t"} {print "chr"$1, $4-1, $4, $2}' ADNI_cluster_01_forward_757LONI_10.bim > ADNI_cluster_01_forward_757LONI_10_hg18.bed
-# Go to http://genome.ucsc.edu/cgi-bin/hgLiftOver to convert from original build to GRCh37/hg19, download the lifted files.
+```
+Now go to http://genome.ucsc.edu/cgi-bin/hgLiftOver to convert from original build to GRCh37/hg19, download the lifted files.
+<img src="https://github.com/kimtae55/GWAS-End-to-End-Tutorial/blob/main/figs/plink.png" width="600">
+
+To convert back to PLINK format and check the build, follow the steps below:
+```
 # Get rsID of failed liftOvers
 > grep -v '^#' hglft_genome_199168_dad920.err.txt | awk '{print $4}' > ADNI_cluster_01_forward_757LONI_10_exclude_snps.txt
 # Convert UCSC mapped BED to plink map
