@@ -117,14 +117,36 @@ print("Build detected:", s.build_detected)
 PY
 ```
 
-Step 2: Identify correct reference panel (also checks for duplicates, among many other things)
+Step 1.5: How to identify correct reference panel (HRC? 1000G? HapMap?)
+```
+```
+
+Step 2: Pre-imputation Correction given reference panel (HRC/1000G) 
 ```
 > curl -L -O https://www.well.ox.ac.uk/~wrayner/tools/HRC-1000G-check-bim-v4.3.0.zip
 > unzip -o HRC-1000G-check-bim-v4.3.0.zip
 > curl -L -O https://ngs.sanger.ac.uk/production/hrc/HRC.r1-1/HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
 > gunzip -f HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
-> plink2 --freq --bfile ADNI_cluster_01_forward_757LONI_12 --out ADNI_cluster_01_forward_757LONI_12.freq
-> perl HRC-1000G-check-bim.pl -b ADNI_cluster_01_forward_757LONI_12.bim -f ADNI_cluster_01_forward_757LONI_12.freq.afreq -r HRC.r1-1.GRCh37.wgs.mac5.sites.tab -h
+
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_12 --chr 1-22 --make-bed --out ADNI_cluster_01_forward_757LONI_12_auto
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_12_auto --freq --out ADNI_cluster_01_forward_757LONI_12_auto
+> awk 'BEGIN{OFS=" "}
+     NR==1 {next}
+     {
+       chr=$1; id=$2; ref=$3; alt=$4; afs=$6; n=$7;
+       if (id=="." || id=="" || ref=="" || alt=="" || afs=="." || n=="." || afs=="" || n=="") next;
+       if (alt ~ /,/) next;
+       af = afs + 0.0; if (af<0) af=0; if (af>1) af=1;
+       if (af <= 0.5) { a1=alt; a2=ref; maf=af } else { a1=ref; a2=alt; maf=1-af }
+       nchr = 2 * (n + 0);
+       printf "%s %s %s %s %.6f %d\n", chr, id, a1, a2, maf, nchr
+     }' ADNI_cluster_01_forward_757LONI_12_auto_withIDs.afreq > ADNI_cluster_01_forward_757LONI_12_auto.frq
+# Sanity check for correct conversion
+# Expect large overlap (tens of thousands), not single digits.
+> cut -d' ' -f2 ADNI_cluster_01_forward_757LONI_12_auto.frq       | sort -u > frq_ids.txt
+> awk '{print $2}' ADNI_cluster_01_forward_757LONI_12_auto_withIDs.bim | sort -u > bim_ids.txt
+> comm -12 frq_ids.txt bim_ids.txt | wc -l
+> perl HRC-1000G-check-bim.pl -b ADNI_cluster_01_forward_757LONI_12_auto.bim -f ADNI_cluster_01_forward_757LONI_12_auto.frq -r HRC.r1-1.GRCh37.wgs.mac5.sites.tab -h
 > chmod +x Run-plink.sh
 > bash Run-plink.sh
 ```
@@ -132,7 +154,6 @@ Step 2: Identify correct reference panel (also checks for duplicates, among many
 Step 4: Imputation via Michigan Imputation Server
 We will convert the plink data to vcf format, then use the MIS to impute data. 
 ```
-## Create a sorted vcf.gz file using BCFtools:
 # Download BCFtools (bcftools-1.14) from http://www.htslib.org/download/
 > cd bcftools-1.14    # and similarly for bcftools and htslib
 > ./configure --prefix=/Users/haishu/Applications/
