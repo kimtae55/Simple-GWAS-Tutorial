@@ -124,7 +124,7 @@ Step 2: Identify correct reference panel (also checks for duplicates, among many
 > curl -L -O https://ngs.sanger.ac.uk/production/hrc/HRC.r1-1/HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
 > gunzip -f HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
 > plink2 --freq --bfile ADNI_cluster_01_forward_757LONI_12 --out ADNI_cluster_01_forward_757LONI_12.freq
-> perl HRC-1000G-check-bim.pl -b ADNI_cluster_01_forward_757LONI_12.bim -f ADNI_cluster_01_forward_757LONI_12.freq.frq -r HRC.r1-1.GRCh37.wgs.mac5.sites.tab -h
+> perl HRC-1000G-check-bim.pl -b ADNI_cluster_01_forward_757LONI_12.bim -f ADNI_cluster_01_forward_757LONI_12.freq.afreq -r HRC.r1-1.GRCh37.wgs.mac5.sites.tab -h
 ```
 
 Step 4: Imputation via Michigan Imputation Server
