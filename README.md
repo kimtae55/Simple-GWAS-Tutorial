@@ -82,7 +82,9 @@ from snps import SNPs
 s = SNPs("ADNI_cluster_01_forward_757LONI_11_chr1.vcf.gz")
 print("assembly:", s.assembly, "build_detected:", s.build_detected)
 PY
-# Go to http://genome.ucsc.edu/cgi-bin/hgLiftOver to convert from original build to GRCh37/hg19, save the lifted files.
+# Convert plink data to txt .bed, since the tool takes in a different format:
+> awk 'BEGIN{OFS="\t"} {print "chr"$1, $4-1, $4, $2}' ADNI_cluster_01_forward_757LONI_10.bim > ADNI_cluster_01_forward_757LONI_10_hg18.bed
+# Go to http://genome.ucsc.edu/cgi-bin/hgLiftOver to convert from original build to GRCh37/hg19, download the lifted files.
 
 ```
 ```
