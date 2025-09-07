@@ -117,31 +117,19 @@ print("Build detected:", s.build_detected)
 PY
 ```
 
-Step 2: Check for duplicates (use ADNI_cluster_01_forward_757LONI_12 if no duplicates, otherwise proceed with ADNI_cluster_01_forward_757LONI_13)
-```
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_12 --set-all-var-ids @:#:\$r:\$a --make-bed --out ADNI_cluster_01_forward_757LONI_12_tmp
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_12_tmp --rm-dup exclude-all --make-bed --out ADNI_cluster_01_forward_757LONI_13
-```
-Since I had no duplicates, I proceed with ADNI_cluster_01_forward_757LONI_12.
-
-Step 3: Population stratification to identify correct reference panel 
-```
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_12 --chr 1-22 --exclude range high-LD-regions-hg19-GRCh37.txt --indep-pairwise 200 50 0.2 --out preimp
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_12 --extract preimp.prune.in --make-bed --out preimp.pruned_all
-> plink2 --bfile preimp.pruned_all --pca 10 approx --out preimp.pca_all_direct
-> Rscript pca_ref_panel_check.R  
-```
-
-Step 4: Imputation via Michigan Imputation Server
-We will convert the plink data to vcf format, then use the MIS to impute data. 
+Step 2: Identify correct reference panel (also checks for duplicates, among many other things)
 ```
 > curl -L -O https://www.well.ox.ac.uk/~wrayner/tools/HRC-1000G-check-bim-v4.3.0.zip
 > unzip -o HRC-1000G-check-bim-v4.3.0.zip
 > curl -L -O https://ngs.sanger.ac.uk/production/hrc/HRC.r1-1/HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
 > gunzip -f HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
-> plink2 --freq --bfile ADNI_cluster_01_forward_757LONI_15 --out ADNI_cluster_01_forward_757LONI_15.freq
-> perl $SNP_path/HRC-1000G-check-bim.pl -b ADNI_cluster_01_forward_757LONI_14.bim -f ADNI_cluster_01_forward_757LONI_14.freq.frq -r $SNP_path/HRC.r1-1.GRCh37.wgs.mac5.sites.tab -h
+> plink2 --freq --bfile ADNI_cluster_01_forward_757LONI_12 --out ADNI_cluster_01_forward_757LONI_12.freq
+> perl $SNP_path/HRC-1000G-check-bim.pl -b ADNI_cluster_01_forward_757LONI_12.bim -f ADNI_cluster_01_forward_757LONI_12.freq.frq -r $SNP_path/HRC.r1-1.GRCh37.wgs.mac5.sites.tab -h
+```
 
+Step 4: Imputation via Michigan Imputation Server
+We will convert the plink data to vcf format, then use the MIS to impute data. 
+```
 ## Create a sorted vcf.gz file using BCFtools:
 # Download BCFtools (bcftools-1.14) from http://www.htslib.org/download/
 > cd bcftools-1.14    # and similarly for bcftools and htslib
