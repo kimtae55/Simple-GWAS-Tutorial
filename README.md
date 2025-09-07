@@ -85,34 +85,31 @@ PY
 # Convert plink data to txt .bed, since the tool takes in a different format:
 > awk 'BEGIN{OFS="\t"} {print "chr"$1, $4-1, $4, $2}' ADNI_cluster_01_forward_757LONI_10.bim > ADNI_cluster_01_forward_757LONI_10_hg18.bed
 # Go to http://genome.ucsc.edu/cgi-bin/hgLiftOver to convert from original build to GRCh37/hg19, download the lifted files.
-
-```
-```
-# https://genviz.org/module-01-intro/0001/06/02/liftoverTools/
-# https://genome.sph.umich.edu/wiki/LiftOver
-# download the LiftOver from http://genome.ucsc.edu/cgi-bin/hgLiftOver
-# download chain file hg18ToHg19.over.chain.gz from http://hgdownload.cse.ucsc.edu/goldenpath/hg18/liftOver/
-# Download files from: https://martha-labbook.netlify.app/posts/converting-snp-array-data/
-> chmod a+x liftOver
-> sudo mv ~/Downloads/liftOver /usr/local/bin/
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_10 --recode --tab --out ADNI_cluster_01_forward_757LONI_11
-> export SNP_path="/Users/taehyo/Library/CloudStorage/Dropbox/NYU/Research/Research/Data/data_l0ipls/GWAS/taehyo/scripts"
-> python $SNP_path/liftOverPlink-master/liftOverPlink.py --bin /usr/local/bin/liftOver --map ADNI_cluster_01_forward_757LONI_11.map --out ADNI_cluster_01_forward_757LONI_11_lifted --chain $SNP_path/hg18ToHg19.over.chain.gz
-> python $SNP_path/liftoverPlink-master/rmBadLifts.py --map ADNI_cluster_01_forward_757LONI_11_lifted.map --out ADNI_cluster_01_forward_757LONI_11_good_lifted.map --log ADNI_cluster_01_forward_757LONI_11_bad_lifted.dat
-> cut -f 2 ADNI_cluster_01_forward_757LONI_11_bad_lifted.dat > ADNI_cluster_01_forward_757LONI_11_snps_exclude.dat
-> cut -f 4 ADNI_cluster_01_forward_757LONI_11_lifted.bed.unlifted | sed "/^#/d" >> ADNI_cluster_01_forward_757LONI_11_snps_exclude.dat 
-> plink2 --file ADNI_cluster_01_forward_757LONI_11 --recode --out ADNI_cluster_01_forward_757LONI_12 --exclude ADNI_cluster_01_forward_757LONI_11_snps_exclude.dat
-> plink2 --ped ADNI_cluster_01_forward_757LONI_12.ped --map ADNI_cluster_01_forward_757LONI_11_good_lifted.map --recode --out ADNI_cluster_01_forward_757LONI_13
-> plink2 --file ADNI_cluster_01_forward_757LONI_13 --make-bed --out ADNI_cluster_01_forward_757LONI_14
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_14 --recode vcf --out ADNI_cluster_01_forward_757LONI_14_vcf
-'''
-# Python code to heck if it has been lifted properly
+# Get rsID of failed liftOvers
+> grep -v '^#' hglft_genome_199168_dad920.err.txt | awk '{print $4}' > ADNI_cluster_01_forward_757LONI_10_exclude_snps.txt
+# Convert UCSC mapped BED to plink map
+> awk 'BEGIN{OFS="\t"} {sub(/^chr/, "", $1); print $1, $4, 0, $3}' hglft_genome_199168_dad920.bed > ADNI_cluster_01_forward_757LONI_10_lifted.map
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_10 --exclude ADNI_cluster_01_forward_757LONI_10_exclude_snps.txt --make-bed --out ADNI_cluster_01_forward_757LONI_11
+# --- INPUTS YOU ALREADY HAVE AT THIS POINT ---
+# ADNI_cluster_01_forward_757LONI_11.{bed,bim,fam}        # post-exclude (failed liftover SNPs removed)
+# hglft_genome_199168_dad920.bed                          # UCSC LiftOver "Converted" (mapped) BED (GRCh37)
+# hglft_genome_199168_dad920.err.txt                      # UCSC LiftOver log (kept earlier for exclude list)
+# Build PLINK update tables from the UCSC-mapped BED
+#    lifted.chr : rsid <tab> newCHR
+#    lifted.pos : rsid <tab> newBP  (use BED 'end' column as 1-based position)
+> awk 'BEGIN{OFS="\t"} {sub(/^chr/,"",$1); print $4, $1}' hglft_genome_199168_dad920.bed > lifted.chr
+> awk 'BEGIN{OFS="\t"} {                    print $4, $3}' hglft_genome_199168_dad920.bed > lifted.pos
+# Update CHR and BP on the _11 set (requires producing a sorted PGEN first), then convert back to BED/BIM/FAM for normal downstream use.
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_11 --update-chr lifted.chr 2 --update-map lifted.pos 2 --sort-vars --make-pgen --out ADNI_cluster_01_forward_757LONI_12_tmp
+> plink2 --pfile ADNI_cluster_01_forward_757LONI_12_tmp --make-bed --out ADNI_cluster_01_forward_757LONI_12
+# Check if the build is correct now
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_12 --recode vcf bgz --out ADNI_cluster_01_forward_757LONI_12_GRCh37
+> python - << 'PY'
 from snps import SNPs
-s = SNPs("ADNI_cluster_01_forward_757LONI_14_vcf.vcf")
-s.build
-s.build_detected
-s.assembly #'GRCh37'
-'''
+s = SNPs("ADNI_cluster_01_forward_757LONI_12_GRCh37.vcf.gz")
+print("Assembly:", s.assembly)
+print("Build detected:", s.build_detected)
+PY
 ```
 
 Step 2: Check for duplicates
