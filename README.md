@@ -150,20 +150,21 @@ Step 2: Pre-imputation Correction given reference panel (HRC/1000G)
 > chmod +x Run-plink.sh
 > bash Run-plink.sh
 ```
+At this point, we have *chr1.vcf to *chr22.vcf
 
 Step 4: Imputation via Michigan Imputation Server
 We will convert the plink data to vcf format, then use the MIS to impute data. 
 ```
 # Download BCFtools (bcftools-1.14) from http://www.htslib.org/download/
 > cd bcftools-1.14    # and similarly for bcftools and htslib
-> ./configure --prefix=/Users/haishu/Applications/
+> ./configure --prefix=/Users/taehyo/Applications/
 > make
 > make install
 > export PATH=/Users/taehyo/Applications/bin:$PATH```
 
 > for chr in {1..22}
 do
-	bcftools sort ADNI_cluster_01_forward_757LONI_15-updated-chr$chr.vcf -Oz -o ADNI_cluster_01_forward_757LONI_15-updated-chr$chr.vcf.gz
+	bcftools sort ADNI_cluster_01_forward_757LONI_12_auto-updated-chr$chr.vcf -Oz -o ADNI_cluster_01_forward_757LONI_12_auto-updated-chr$chr.vcf.gz
 done
 
 # Now upload to Michigan Imputation Server for imputation: https://imputationserver.sph.umich.edu/index.html#!pages/login
