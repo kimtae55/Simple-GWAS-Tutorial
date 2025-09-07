@@ -73,6 +73,19 @@ Step 6: We exclude all individuals with a PI_HAT > 0.2 to remove cryptic related
 
 Step 1: ADNI datasets are often on older genome builds (e.g., hg18/NCBI36). Before imputation, convert to hg19/GRCh37. This ensures all datasets use the same genome coordinates, resulting in .bed/.bim/.fam files aligned to GRCh37. 
 ```
+# Check for original build
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_10 --chr 1 --recode vcf bgz --out ADNI_cluster_01_forward_757LONI_11_chr1
+# Quick assembly check on the VCF
+> pip install snps
+> python - << 'PY'
+from snps import SNPs
+s = SNPs("ADNI_cluster_01_forward_757LONI_11_chr1.vcf.gz")
+print("assembly:", s.assembly, "build_detected:", s.build_detected)
+PY
+# Go to http://genome.ucsc.edu/cgi-bin/hgLiftOver to convert from original build to GRCh37/hg19, save the lifted files.
+
+```
+```
 # https://genviz.org/module-01-intro/0001/06/02/liftoverTools/
 # https://genome.sph.umich.edu/wiki/LiftOver
 # download the LiftOver from http://genome.ucsc.edu/cgi-bin/hgLiftOver
