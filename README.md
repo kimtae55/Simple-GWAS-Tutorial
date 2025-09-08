@@ -9,6 +9,22 @@ The output is a genotype matrix of shape (n x p), where n is the number of subje
 ## Prerequisites
 You need to have the following installed: ```plink2, R, python```
 
+Download BCFtools (bcftools-1.14) from [http://www.htslib.org/download/](http://www.htslib.org/download/), then: 
+```
+> cd bcftools-1.14    # and similarly for bcftools and htslib
+> ./configure --prefix=/Users/taehyo/Applications/
+> make
+> make install
+> export PATH=/Users/taehyo/Applications/bin:$PATH```
+```
+Download Pre-imputation Checker for 1000G/HRC reference panel (optional)
+```
+> curl -L -O https://www.well.ox.ac.uk/~wrayner/tools/HRC-1000G-check-bim-v4.3.0.zip
+> unzip -o HRC-1000G-check-bim-v4.3.0.zip
+> curl -L -O https://ngs.sanger.ac.uk/production/hrc/HRC.r1-1/HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
+> gunzip -f HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
+```
+
 ## Assumption: You have SNP data in PLINK format
 <img src="https://github.com/kimtae55/GWAS-End-to-End-Tutorial/blob/main/figs/plink.png" width="600">
 
@@ -132,11 +148,6 @@ We usually do a PCA step here to decide which reference panel our dataset is mos
 
 Step 2: Pre-imputation Correction given reference panel (HRC/1000G) 
 ```
-> curl -L -O https://www.well.ox.ac.uk/~wrayner/tools/HRC-1000G-check-bim-v4.3.0.zip
-> unzip -o HRC-1000G-check-bim-v4.3.0.zip
-> curl -L -O https://ngs.sanger.ac.uk/production/hrc/HRC.r1-1/HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
-> gunzip -f HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
-
 > plink2 --bfile ADNI_cluster_01_forward_757LONI_12 --chr 1-22 --make-bed --out ADNI_cluster_01_forward_757LONI_12_auto
 > plink2 --bfile ADNI_cluster_01_forward_757LONI_12_auto --freq --out ADNI_cluster_01_forward_757LONI_12_auto
 > awk 'BEGIN{OFS=" "}
@@ -164,13 +175,6 @@ At this point, we have *chr1.vcf to *chr22.vcf
 Step 4: Imputation via Michigan Imputation Server
 We will convert the plink data to vcf format, then use the MIS to impute data. 
 ```
-# Download BCFtools (bcftools-1.14) from http://www.htslib.org/download/
-> cd bcftools-1.14    # and similarly for bcftools and htslib
-> ./configure --prefix=/Users/taehyo/Applications/
-> make
-> make install
-> export PATH=/Users/taehyo/Applications/bin:$PATH```
-
 > for chr in {1..22}
 do
 	bcftools sort ADNI_cluster_01_forward_757LONI_12_auto-updated-chr$chr.vcf -Oz -o ADNI_cluster_01_forward_757LONI_12_auto-updated-chr$chr.vcf.gz
