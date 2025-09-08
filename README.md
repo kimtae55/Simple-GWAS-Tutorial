@@ -65,8 +65,17 @@ Step 5: Remove individuals with a heterozygosity rate deviating more than 3 sd f
 
 Step 6: We exclude all individuals with a PI_HAT > 0.2 to remove cryptic relatedness, assuming a random population sample.
 ```
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_8 --indep-pairwise 200 100 0.1 --out indepSNP
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_8 --extract indepSNP.prune.in --king-cutoff 0.10 --make-bed --out ADNI_cluster_01_forward_757LONI_10
+# 1) LD-prune SNPs (used only for relatedness detection)
+plink2 --bfile ADNI_cluster_01_forward_757LONI_8 --indep-pairwise 200 100 0.1 --out indepSNP
+
+# 2) Use pruned SNPs to identify related individuals (temporary dataset)
+plink2 --bfile ADNI_cluster_01_forward_757LONI_8 --extract indepSNP.prune.in --king-cutoff 0.10 --make-bed --out ADNI_relcheck_tmp
+
+# 3) Save list of unrelated individuals
+awk '{print $1, $2}' ADNI_relcheck_tmp.fam > unrelated.keep
+
+# 4) Apply unrelated sample list to full dataset (keeps ~500k SNPs)
+plink2 --bfile ADNI_cluster_01_forward_757LONI_8 --keep unrelated.keep --make-bed --out ADNI_cluster_01_forward_757LONI_10
 ```
 
 ### Liftover and Imputation:
