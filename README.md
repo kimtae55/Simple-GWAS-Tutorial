@@ -164,7 +164,7 @@ Step 2: Pre-imputation Correction given reference panel (HRC/1000G)
 # Sanity check for correct conversion
 # Expect large overlap (tens of thousands), not single digits.
 > cut -d' ' -f2 ADNI_cluster_01_forward_757LONI_12_auto.frq       | sort -u > frq_ids.txt
-> awk '{print $2}' ADNI_cluster_01_forward_757LONI_12_auto_withIDs.bim | sort -u > bim_ids.txt
+> awk '{print $2}' ADNI_cluster_01_forward_757LONI_12_auto.bim | sort -u > bim_ids.txt
 > comm -12 frq_ids.txt bim_ids.txt | wc -l
 > perl HRC-1000G-check-bim.pl -b ADNI_cluster_01_forward_757LONI_12_auto.bim -f ADNI_cluster_01_forward_757LONI_12_auto.frq -r HRC.r1-1.GRCh37.wgs.mac5.sites.tab -h
 > chmod +x Run-plink.sh
