@@ -127,6 +127,7 @@ PY
 ```
 
 Step 1.5: How to identify correct reference panel (HRC? 1000G? HapMap?)
+
 We usually do a PCA step here to decide which reference panel our dataset is most aligned with, but since ADNI is >90% non-hispanic/hispanic caucasian, we use the HRC.r1-1.GRCh37 (src:[https://doi.org/10.1111/cns.14073]( https://doi.org/10.1111/cns.14073))
 
 Step 2: Pre-imputation Correction given reference panel (HRC/1000G) 
