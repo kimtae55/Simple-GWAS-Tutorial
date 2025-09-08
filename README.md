@@ -49,7 +49,7 @@ Step 1: Handle missingness per individual and per SNP: Delete individuals with m
 
 Step 2: Handle sex discrepancy: Subjects who were a priori determined as females must have a F value of <0.2, and subjects who were a priori determined as males must have a F value >0.8. This F value is based on the X chromosome inbreeding (homozygosity) estimate. Subjects who do not fulfil these requirements are flagged "PROBLEM" by PLINK.
 ```
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_3 --check-sex 
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_3 --check-sex max-female-xf=0.2 min-male-xf=0.8
 > Rscript --no-save gender_check.R # Visualize sex dicrepancy check
 > grep "PROBLEM" plink2.sexcheck| awk '{print$1,$2}'> sex_discrepancy.txt
 > plink2 --bfile ADNI_cluster_01_forward_757LONI_3 --remove sex_discrepancy.txt --make-bed --out ADNI_cluster_01_forward_757LONI_4 
