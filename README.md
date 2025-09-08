@@ -180,6 +180,11 @@ do
 	bcftools sort ADNI_cluster_01_forward_757LONI_12_auto-updated-chr$chr.vcf -Oz -o ADNI_cluster_01_forward_757LONI_12_auto-updated-chr$chr.vcf.gz
 done
 
+> for chr in {1..22}
+do
+    echo "chr${chr}: $(bcftools view -H ADNI_GO_2_Forward_Bin_10_auto-updated-chr${chr}.vcf.gz | wc -l) variants"
+done
+
 # Now upload to Michigan Imputation Server for imputation: https://imputationserver.sph.umich.edu/index.html#!pages/login
 
 > for chr in $(seq 1 22)
