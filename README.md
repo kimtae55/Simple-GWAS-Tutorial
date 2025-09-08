@@ -160,7 +160,7 @@ Step 2: Pre-imputation Correction given reference panel (HRC/1000G)
        if (af <= 0.5) { a1=alt; a2=ref; maf=af } else { a1=ref; a2=alt; maf=1-af }
        nchr = 2 * (n + 0);
        printf "%s %s %s %s %.6f %d\n", chr, id, a1, a2, maf, nchr
-     }' ADNI_cluster_01_forward_757LONI_12_auto_withIDs.afreq > ADNI_cluster_01_forward_757LONI_12_auto.frq
+     }' ADNI_cluster_01_forward_757LONI_12_auto.afreq > ADNI_cluster_01_forward_757LONI_12_auto.frq
 # Sanity check for correct conversion
 # Expect large overlap (tens of thousands), not single digits.
 > cut -d' ' -f2 ADNI_cluster_01_forward_757LONI_12_auto.frq       | sort -u > frq_ids.txt
