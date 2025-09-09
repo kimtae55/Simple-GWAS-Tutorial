@@ -15,7 +15,6 @@ Download BCFtools (bcftools-1.14) from [http://www.htslib.org/download/](http://
 > ./configure --prefix=/Users/taehyo/Applications/
 > make
 > make install
-> export PATH=/Users/taehyo/Applications/bin:$PATH```
 ```
 Download Pre-imputation Checker for 1000G/HRC reference panel (optional)
 ```
@@ -24,6 +23,8 @@ Download Pre-imputation Checker for 1000G/HRC reference panel (optional)
 > curl -L -O https://ngs.sanger.ac.uk/production/hrc/HRC.r1-1/HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
 > gunzip -f HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
 ```
+
+Add plink2/R/python/bcftools to PATH for convenience. 
 
 ## Assumption: You have SNP data in PLINK format
 <img src="https://github.com/kimtae55/GWAS-End-to-End-Tutorial/blob/main/figs/plink.png" width="600">
