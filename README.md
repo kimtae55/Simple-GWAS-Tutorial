@@ -97,7 +97,7 @@ plink2 --bfile ADNI_cluster_01_forward_757LONI_8 --keep unrelated.keep --make-be
 
 ### Liftover and Imputation:
 
-Step 1: ADNI datasets are often on older genome builds (e.g., hg18/NCBI36). Before imputation, convert to hg19/GRCh37. This ensures all datasets use the same genome coordinates, resulting in .bed/.bim/.fam files aligned to GRCh37. 
+Step 1: ADNI datasets are often on older genome builds (e.g., hg18/NCBI36). Before imputation, convert to hg19/GRCh37. This ensures all datasets use the same genome coordinates, resulting in .bed/.bim/.fam files aligned to GRCh37. You could also lift to hg38, which is the most current reference genome build, but I choose hg19 because it is easier to validate against existing works (e.g [doi:10.1016/j.neurobiolaging.2019.06.003]([doi:10.1016/j.neurobiolaging.2019.06.003](https://pmc.ncbi.nlm.nih.gov/articles/PMC6732252/)), [doi: 10.1186/s12880-025-01782-2](https://pubmed.ncbi.nlm.nih.gov/40676546/))
 ```
 # Check for original build
 > plink2 --bfile ADNI_cluster_01_forward_757LONI_10 --chr 1 --recode vcf bgz --out ADNI_cluster_01_forward_757LONI_11_chr1
