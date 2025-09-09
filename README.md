@@ -202,7 +202,9 @@ bcftools annotate -Oz -x ID -I +'%CHROM:%POS:%REF:%ALT' -o ADNI1_allchromosomes.
 
 ### Population Structure Modeling:
 
-I repeat the above steps for ADNI1, ADNI2, and ADNIGO. If you only have a single dataset, you can skip the below merge process. 
+At this moment, I have ADNI1/GO/2 imputed with the HRC r1.1 (hg19) panel, which is European-centric. I assess ancestry and adjust for population structure by anchoring PCA to an external reference panel (HapMap3 or 1000G) which has more coverage beyond European ancestry. I compute allele-weighted PCs on the combined ADNI + external reference dataset so the axes reflect global ancestry, then project each ADNI cohort onto this shared PC space. Correct clustering is confirmed when ADNI samples group tightly with European reference populations (e.g., CEU/TSI), while outliers are identified if they drift toward non-European clusters. I will utilize the samples that align well with the HRC r1.1 (hg19) panel. The top 10 PCs are also saved to be included later as covariates for GWAS. 
+```
+```
 
 (Optional Step): If you have multiple datasets, merge all of them now that they are aligned and imputed on the same genome build, followed by final post-merge quality check. 
 ```
