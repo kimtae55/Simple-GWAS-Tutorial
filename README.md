@@ -114,7 +114,7 @@ PY
 # Convert plink data to txt .bed, since the tool takes in a different format:
 > awk 'BEGIN{OFS="\t"} {print "chr"$1, $4-1, $4, $2}' ADNI_cluster_01_forward_757LONI_10.bim > ADNI_cluster_01_forward_757LONI_10_hg18.bed
 ```
-Now go to http://genome.ucsc.edu/cgi-bin/hgLiftOver to convert from original build to GRCh37/hg19, download the lifted files.
+Now go to http://genome.ucsc.edu/cgi-bin/hgLiftOver to convert from original build to GRCh38/hg38, download the lifted files.
 <img src="https://github.com/kimtae55/GWAS-End-to-End-Tutorial/blob/main/figs/liftover.png" width="600">
 
 To convert back to PLINK format and check the build, follow the steps below:
@@ -137,10 +137,10 @@ To convert back to PLINK format and check the build, follow the steps below:
 > plink2 --bfile ADNI_cluster_01_forward_757LONI_11 --update-chr lifted.chr 2 --update-map lifted.pos 2 --sort-vars --make-pgen --out ADNI_cluster_01_forward_757LONI_12_tmp
 > plink2 --pfile ADNI_cluster_01_forward_757LONI_12_tmp --make-bed --out ADNI_cluster_01_forward_757LONI_12
 # Check if the build is correct now
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_12 --recode vcf bgz --out ADNI_cluster_01_forward_757LONI_12_GRCh37
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_12 --recode vcf bgz --out ADNI_cluster_01_forward_757LONI_12_GRCh38
 > python - << 'PY'
 from snps import SNPs
-s = SNPs("ADNI_cluster_01_forward_757LONI_12_GRCh37.vcf.gz")
+s = SNPs("ADNI_cluster_01_forward_757LONI_12_GRCh38.vcf.gz")
 print("Assembly:", s.assembly)
 print("Build detected:", s.build_detected)
 PY
@@ -153,37 +153,19 @@ We usually do a PCA step here to decide which reference panel our dataset is mos
 Step 2: Pre-imputation Correction given reference panel (HRC/1000G) 
 ```
 > plink2 --bfile ADNI_cluster_01_forward_757LONI_12 --chr 1-22 --make-bed --out ADNI_cluster_01_forward_757LONI_12_auto
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_12_auto --freq --out ADNI_cluster_01_forward_757LONI_12_auto
-> awk 'BEGIN{OFS=" "}
-     NR==1 {next}
-     {
-       chr=$1; id=$2; ref=$3; alt=$4; afs=$6; n=$7;
-       if (id=="." || id=="" || ref=="" || alt=="" || afs=="." || n=="." || afs=="" || n=="") next;
-       if (alt ~ /,/) next;
-       af = afs + 0.0; if (af<0) af=0; if (af>1) af=1;
-       if (af <= 0.5) { a1=alt; a2=ref; maf=af } else { a1=ref; a2=alt; maf=1-af }
-       nchr = 2 * (n + 0);
-       printf "%s %s %s %s %.6f %d\n", chr, id, a1, a2, maf, nchr
-     }' ADNI_cluster_01_forward_757LONI_12_auto.afreq > ADNI_cluster_01_forward_757LONI_12_auto.frq
-# Sanity check for correct conversion
-# Expect large overlap (tens of thousands), not single digits.
-> cut -d' ' -f2 ADNI_cluster_01_forward_757LONI_12_auto.frq       | sort -u > frq_ids.txt
-> awk '{print $2}' ADNI_cluster_01_forward_757LONI_12_auto.bim | sort -u > bim_ids.txt
-> comm -12 frq_ids.txt bim_ids.txt | wc -l
-> perl HRC-1000G-check-bim.pl -b ADNI_cluster_01_forward_757LONI_12_auto.bim -f ADNI_cluster_01_forward_757LONI_12_auto.frq -r HRC.r1-1.GRCh37.wgs.mac5.sites.tab -h
-> chmod +x Run-plink.sh
-> bash Run-plink.sh
+> for chr in {1..22}
+do
+  plink2 \
+    --bfile ADNI_cluster_01_forward_757LONI_12_auto \
+    --chr $chr \
+    --recode vcf bgz \
+    --out ADNI_cluster_01_forward_757LONI_12_auto-updated-chr$chr
+done
 ```
 At this point, we have *chr1.vcf to *chr22.vcf
 
 Step 4: Imputation via Michigan Imputation Server
-We will convert the plink data to vcf format, then use the MIS to impute data. 
 ```
-> for chr in {1..22}
-do
-	bcftools sort ADNI_cluster_01_forward_757LONI_12_auto-updated-chr$chr.vcf -Oz -o ADNI_cluster_01_forward_757LONI_12_auto-updated-chr$chr.vcf.gz
-done
-
 > for chr in {1..22}
 do
     echo "chr${chr}: $(bcftools view -H ADNI_cluster_01_forward_757LONI_12_auto-updated-chr${chr}.vcf.gz | wc -l) variants"
