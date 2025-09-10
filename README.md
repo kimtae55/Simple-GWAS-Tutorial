@@ -39,132 +39,237 @@ If you have multiple datasets from different studies/timepoints, you should run 
 
 Step 1: Handle missingness per individual and per SNP: Delete individuals with missingness >0.05.
 ```
-> plink2 --bfile ADNI_cluster_01_forward_757LONI --missing 
-> Rscript --no-save hist_miss.R # Visualize missingness
-> plink2 --bfile ADNI_cluster_01_forward_757LONI --geno 0.05 --make-bed --out ADNI_cluster_01_forward_757LONI_2
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_2 --mind 0.05 --make-bed --out ADNI_cluster_01_forward_757LONI_3
+# Define the base file name
+base="ADNI_cluster_01_forward_757LONI"
+
+# Step 1. Visualize missingness
+plink2 --bfile "$base" --missing
+Rscript --no-save hist_miss.R
+
+# Step 2. Filter SNPs with missingness > 5%
+plink2 --bfile "$base" \
+       --geno 0.05 \
+       --make-bed \
+       --out "${base}_2"
+
+# Step 3. Filter individuals with missingness > 5%
+plink2 --bfile "${base}_2" \
+       --mind 0.05 \
+       --make-bed \
+       --out "${base}_3"
 ```
 
 Step 2: Handle sex discrepancy: Subjects who were a priori determined as females must have a F value of <0.2, and subjects who were a priori determined as males must have a F value >0.8. This F value is based on the X chromosome inbreeding (homozygosity) estimate. Subjects who do not fulfil these requirements are flagged "PROBLEM" by PLINK.
 ```
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_3 --check-sex max-female-xf=0.2 min-male-xf=0.8
-> Rscript --no-save gender_check.R # Visualize sex dicrepancy check
-> grep "PROBLEM" plink2.sexcheck| awk '{print$1,$2}'> sex_discrepancy.txt
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_3 --remove sex_discrepancy.txt --make-bed --out ADNI_cluster_01_forward_757LONI_4 
+# Step 1. Check sex discrepancies
+plink2 --bfile "${base}_3" \
+       --check-sex max-female-xf=0.2 min-male-xf=0.8
+
+# Step 2. Visualize sex discrepancy check
+Rscript --no-save gender_check.R
+
+# Step 3. Extract problematic samples
+grep "PROBLEM" plink2.sexcheck | awk '{print $1, $2}' > sex_discrepancy.txt
+
+# Step 4. Remove problematic samples
+plink2 --bfile "${base}_3" \
+       --remove sex_discrepancy.txt \
+       --make-bed \
+       --out "${base}_4"
 ```
 
 Step 3: Extract autosomal SNPs only and delete SNPs with a low minor allele frequency (MAF <0.01).
 ```
-> awk '{ if ($1 >= 1 && $1 <= 22) print $2 }' ADNI_cluster_01_forward_757LONI_4.bim > snp_1_22.txt
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_4 --extract snp_1_22.txt --make-bed --out ADNI_cluster_01_forward_757LONI_5
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_5 --freq --out MAF_check
-> Rscript --no-save MAF_check.R
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_5 --maf 0.01 --make-bed --out ADNI_cluster_01_forward_757LONI_6
+# Step 1. Extract autosomal SNPs (chr 1–22)
+awk '{ if ($1 >= 1 && $1 <= 22) print $2 }' "${base}_4.bim" > snp_1_22.txt
+
+# Step 2. Keep only autosomal SNPs
+plink2 --bfile "${base}_4" \
+       --extract snp_1_22.txt \
+       --make-bed \
+       --out "${base}_5"
+
+# Step 3. Calculate allele frequencies
+plink2 --bfile "${base}_5" \
+       --freq \
+       --out MAF_check
+
+# Step 4. Visualize MAF distribution
+Rscript --no-save MAF_check.R
+
+# Step 5. Filter SNPs with MAF < 1%
+plink2 --bfile "${base}_5" \
+       --maf 0.01 \
+       --make-bed \
+       --out "${base}_6"
 ```
 
 Step 4: Delete SNPs which are not in Hardy-Weinberg equilibrium (HWE).
 ```
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_6 --hardy
-> Rscript --no-save hwe.R
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_6 --hwe 1e-6 --make-bed --out ADNI_cluster_01_forward_757LONI_7
+# Step 1. Compute Hardy-Weinberg Equilibrium (HWE) stats
+plink2 --bfile "${base}_6" \
+       --hardy
+
+# Step 2. Visualize HWE results
+Rscript --no-save hwe.R
+
+# Step 3. Filter SNPs failing HWE (p < 1e-6)
+plink2 --bfile "${base}_6" \
+       --hwe 1e-6 \
+       --make-bed \
+       --out "${base}_7"
 ```
 
 Step 5: Remove individuals with a heterozygosity rate deviating more than 3 sd from the mean.
 ```
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_7 --exclude range high-LD-regions-hg18-NCBI36.txt --indep-pairwise 50 5 0.2 --out indepSNP
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_7 --extract indepSNP.prune.in --het --out R_check
-> Rscript --no-save check_heterozygosity_rate.R
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_7 --remove het_fail_ind.txt --make-bed --out ADNI_cluster_01_forward_757LONI_8 
+# Step 1. LD pruning — exclude long-range high-LD regions, keep independent SNPs
+plink2 --bfile "${base}_7" \
+       --exclude range high-LD-regions-hg18-NCBI36.txt \
+       --indep-pairwise 50 5 0.2 \
+       --out indepSNP
+
+# Step 2. Check heterozygosity using pruned SNPs
+plink2 --bfile "${base}_7" \
+       --extract indepSNP.prune.in \
+       --het \
+       --out R_check
+
+# Step 3. Visualize heterozygosity rates
+Rscript --no-save check_heterozygosity_rate.R
+
+# Step 4. Remove individuals failing heterozygosity QC
+plink2 --bfile "${base}_7" \
+       --remove het_fail_ind.txt \
+       --make-bed \
+       --out "${base}_8"
 ```
 
 Step 6: We exclude all individuals with a PI_HAT > 0.2 to remove cryptic relatedness, assuming a random population sample.
 ```
 # 1) LD-prune SNPs (used only for relatedness detection)
-plink2 --bfile ADNI_cluster_01_forward_757LONI_8 --indep-pairwise 200 100 0.1 --out indepSNP
+plink2 --bfile "${base}_8" \
+       --indep-pairwise 200 100 0.1 \
+       --out indepSNP
 
 # 2) Use pruned SNPs to identify related individuals (temporary dataset)
-plink2 --bfile ADNI_cluster_01_forward_757LONI_8 --extract indepSNP.prune.in --king-cutoff 0.10 --make-bed --out ADNI_relcheck_tmp
+plink2 --bfile "${base}_8" \
+       --extract indepSNP.prune.in \
+       --king-cutoff 0.10 \
+       --make-bed \
+       --out ADNI_relcheck_tmp
 
 # 3) Save list of unrelated individuals
 awk '{print $1, $2}' ADNI_relcheck_tmp.fam > unrelated.keep
 
-# 4) Apply unrelated sample list to full dataset (keeps ~500k SNPs)
-plink2 --bfile ADNI_cluster_01_forward_757LONI_8 --keep unrelated.keep --make-bed --out ADNI_cluster_01_forward_757LONI_10
+# 4) Apply unrelated sample list to full dataset (keeps all SNPs, drops related individuals)
+plink2 --bfile "${base}_8" \
+       --keep unrelated.keep \
+       --make-bed \
+       --out "${base}_10"
 ```
 
 ### Liftover and Imputation:
 
 Step 1: ADNI datasets are often on older genome builds (e.g., hg18/NCBI36). Before imputation, convert to hg19/GRCh37. This ensures all datasets use the same genome coordinates, resulting in .bed/.bim/.fam files aligned to GRCh37. You could also lift to hg38, which is the most current reference genome build, but I choose hg19 because it is easier to validate against existing works (e.g [doi:10.1016/j.neurobiolaging.2019.06.003](https://pmc.ncbi.nlm.nih.gov/articles/PMC6732252/), [doi: 10.1186/s12880-025-01782-2](https://pubmed.ncbi.nlm.nih.gov/40676546/))
 ```
-# Check for original build
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_10 --chr 1 --recode vcf bgz --out ADNI_cluster_01_forward_757LONI_11_chr1
-# Quick assembly check on the VCF
-> pip install snps
-> python - << 'PY'
+# Step 1. Export chr1 VCF to check genome build
+plink2 --bfile "${base}_10" \
+       --chr 1 \
+       --recode vcf bgz \
+       --out "${base}_11_chr1"
+
+# Step 2. Quick assembly check on VCF
+pip install snps
+python - << 'PY'
 from snps import SNPs
-s = SNPs("ADNI_cluster_01_forward_757LONI_11_chr1.vcf.gz")
+s = SNPs("${base}_11_chr1.vcf.gz")
 print("assembly:", s.assembly, "build_detected:", s.build_detected)
 PY
-# Convert plink data to txt .bed, since the tool takes in a different format:
-> awk 'BEGIN{OFS="\t"} {print "chr"$1, $4-1, $4, $2}' ADNI_cluster_01_forward_757LONI_10.bim > ADNI_cluster_01_forward_757LONI_10_hg18.bed
+
+# Step 3. Convert .bim to UCSC BED format for liftover (assumes original build = hg18)
+awk 'BEGIN{OFS="\t"} {print "chr"$1, $4-1, $4, $2}' \
+    "${base}_10.bim" > "${base}_10_hg18.bed"
 ```
 Now go to http://genome.ucsc.edu/cgi-bin/hgLiftOver to convert from original build to GRCh38/hg38, download the lifted files.
 <img src="https://github.com/kimtae55/GWAS-End-to-End-Tutorial/blob/main/figs/liftover.png" width="600">
 
 To convert back to PLINK format and check the build, follow the steps below:
 ```
-# Get rsID of failed liftOvers
-> grep -v '^#' hglft_genome_199168_dad920.err.txt | awk '{print $4}' > ADNI_cluster_01_forward_757LONI_10_exclude_snps.txt
-# Convert UCSC mapped BED to plink map
-> awk 'BEGIN{OFS="\t"} {sub(/^chr/, "", $1); print $1, $4, 0, $3}' hglft_genome_199168_dad920.bed > ADNI_cluster_01_forward_757LONI_10_lifted.map
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_10 --exclude ADNI_cluster_01_forward_757LONI_10_exclude_snps.txt --make-bed --out ADNI_cluster_01_forward_757LONI_11
-# --- INPUTS YOU ALREADY HAVE AT THIS POINT ---
-# ADNI_cluster_01_forward_757LONI_11.{bed,bim,fam}        # post-exclude (failed liftover SNPs removed)
-# hglft_genome_199168_dad920.bed                          # UCSC LiftOver "Converted" (mapped) BED (GRCh37)
-# hglft_genome_199168_dad920.err.txt                      # UCSC LiftOver log (kept earlier for exclude list)
-# Build PLINK update tables from the UCSC-mapped BED
-#    lifted.chr : rsid <tab> newCHR
-#    lifted.pos : rsid <tab> newBP  (use BED 'end' column as 1-based position)
-> awk 'BEGIN{OFS="\t"} {sub(/^chr/,"",$1); print $4, $1}' hglft_genome_199168_dad920.bed > lifted.chr
-> awk 'BEGIN{OFS="\t"} {                    print $4, $3}' hglft_genome_199168_dad920.bed > lifted.pos
-# Update CHR and BP on the _11 set (requires producing a sorted PGEN first), then convert back to BED/BIM/FAM for normal downstream use.
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_11 --update-chr lifted.chr 2 --update-map lifted.pos 2 --sort-vars --make-pgen --out ADNI_cluster_01_forward_757LONI_12_tmp
-> plink2 --pfile ADNI_cluster_01_forward_757LONI_12_tmp --make-bed --out ADNI_cluster_01_forward_757LONI_12
-# Check if the build is correct now
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_12 --recode vcf bgz --out ADNI_cluster_01_forward_757LONI_12_GRCh38
-> python - << 'PY'
+# Files produced by UCSC LiftOver (you already have these)
+#   - Converted BED (target build, e.g., GRCh38):   hglft_genome_199168_dad920.bed
+#   - Error log with unmapped intervals:            hglft_genome_199168_dad920.err.txt
+
+# 1) Get rsIDs of failed liftOvers (exclude list)
+grep -v '^#' hglft_genome_199168_dad920.err.txt | awk '{print $4}' > "${base}_10_exclude_snps.txt"
+
+# 2) (Optional) Create a PLINK .map from the converted BED (for reference/inspection)
+#    Columns: chr (no 'chr' prefix), rsID, genetic_distance(=0), new_bp (BED end; 1-based)
+awk 'BEGIN{OFS="\t"} {sub(/^chr/, "", $1); print $1, $4, 0, $3}' \
+    hglft_genome_199168_dad920.bed > "${base}_10_lifted.map"
+
+# 3) Drop variants that failed to lift
+plink2 --bfile "${base}_10" \
+       --exclude "${base}_10_exclude_snps.txt" \
+       --make-bed \
+       --out "${base}_11"
+
+# 4) Build PLINK update tables from the converted BED
+#    lifted.chr : rsid <tab> newCHR(without 'chr')
+#    lifted.pos : rsid <tab> newBP  (use BED 'end' col as 1-based position)
+awk 'BEGIN{OFS="\t"} {sub(/^chr/,"",$1); print $4, $1}' hglft_genome_199168_dad920.bed > lifted.chr
+awk 'BEGIN{OFS="\t"} {                    print $4, $3}' hglft_genome_199168_dad920.bed > lifted.pos
+
+# 5) Update CHR/BP on the post-exclude set; sort variants; write temporary PGEN; convert back to BED
+plink2 --bfile "${base}_11" \
+       --update-chr lifted.chr 2 \
+       --update-map  lifted.pos 2 \
+       --sort-vars \
+       --make-pgen \
+       --out "${base}_12_tmp"
+
+plink2 --pfile "${base}_12_tmp" \
+       --make-bed \
+       --out "${base}_12"
+
+# 6) Quick build sanity check by exporting a VCF and letting 'snps' detect assembly
+plink2 --bfile "${base}_12" \
+       --recode vcf bgz \
+       --out "${base}_12_GRCh38"   # rename GRCh37 if that’s your target
+
+python - <<PY
 from snps import SNPs
-s = SNPs("ADNI_cluster_01_forward_757LONI_12_GRCh38.vcf.gz")
-print("Assembly:", s.assembly)
-print("Build detected:", s.build_detected)
+s = SNPs("${base}_12_GRCh38.vcf.gz")
+print("Assembly:", s.assembly, "Build detected:", s.build_detected)
 PY
 ```
 
-Step 1.5: How to identify correct reference panel (HRC? 1000G? HapMap?)
-
-We usually do a PCA step here to decide which reference panel our dataset is most aligned with, but since ADNI is >90% non-hispanic/hispanic caucasian, we use the HRC.r1-1.GRCh37 (src:[https://doi.org/10.1111/cns.14073]( https://doi.org/10.1111/cns.14073))
-
-Step 2: Pre-imputation Correction given reference panel (HRC/1000G) 
+Step 2: Pre-imputation setup
 ```
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_12 --chr 1-22 --make-bed --out ADNI_cluster_01_forward_757LONI_12_auto
-> for chr in {1..22}
+# Step 1. Keep only autosomal chromosomes (1–22)
+plink2 --bfile "${base}_12" \
+       --chr 1-22 \
+       --make-bed \
+       --out "${base}_12_auto"
+
+# Step 2. Export per-chromosome, bgzipped VCF files (ready for imputation)
+for chr in {1..22}
 do
   plink2 \
-    --bfile ADNI_cluster_01_forward_757LONI_12_auto \
-    --chr $chr \
+    --bfile "${base}_12_auto" \
+    --chr "$chr" \
     --recode vcf bgz \
-    --out ADNI_cluster_01_forward_757LONI_12_auto-updated-chr$chr
+    --out "${base}_12_auto-updated-chr${chr}"
+done
+
+# Check SNPs exist
+for chr in {1..22}; do
+  echo "chr${chr}: $(bcftools view -H "${base}_12_auto-updated-chr${chr}.vcf.gz" | wc -l) variants"
 done
 ```
 At this point, we have *chr1.vcf to *chr22.vcf
 
 Step 4: Imputation via Michigan Imputation Server
 ```
-> for chr in {1..22}
-do
-    echo "chr${chr}: $(bcftools view -H ADNI_cluster_01_forward_757LONI_12_auto-updated-chr${chr}.vcf.gz | wc -l) variants"
-done
-
 # Now upload to Michigan Imputation Server for imputation: https://imputationserver.sph.umich.edu/index.html#!pages/login
 
 > for chr in $(seq 1 22)   
