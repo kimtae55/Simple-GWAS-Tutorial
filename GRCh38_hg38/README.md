@@ -1,6 +1,6 @@
-# Simple GWAS Tutorial
+# Simple GWAS Tutorial for Plink2
 This is a Step by Step Tutorial for GWAS (for Plink format), explaining what SNP data looks like, how to perform quality control and imputation procedures, and how to run GWAS.
-Credits for the figures and explanations here go to the more in-depth tutorials: [GWASTutorial1](https://cloufield.github.io/GWASTutorial), [GWASTutorial2](https://www.ncbi.nlm.nih.gov/pubmed/29484742), or [GWASTutorial3](https://pmc.ncbi.nlm.nih.gov/articles/PMC6001694/). The codes are taken from [https://github.com/MareesAT/GWA_tutorial](https://github.com/MareesAT/GWA_tutorial), but modified to be plink2 compatible. 
+Credits for the figures and explanations here go to the more in-depth tutorials: [GWASTutorial1](https://cloufield.github.io/GWASTutorial), [GWASTutorial2](https://www.ncbi.nlm.nih.gov/pubmed/29484742), or [GWASTutorial3](https://pmc.ncbi.nlm.nih.gov/articles/PMC6001694/). Most of the codes are taken from [https://github.com/MareesAT/GWA_tutorial](https://github.com/MareesAT/GWA_tutorial), but modified to be compatible with plink2 (for macbook m1 and above users). 
 
 I aggregate all components of GWAS into one repository for study purposes, and to clear the confusion of what to download and when/how to run certain scripts. This means that you can replace my data with your .bed, .bim, .fam files and replicate the whole experiment. 
 
@@ -8,6 +8,23 @@ The output is a genotype matrix of shape (n x p), where n is the number of subje
 
 ## Prerequisites
 You need to have the following installed: ```plink2, R, python```
+
+Download BCFtools (bcftools-1.14) from [http://www.htslib.org/download/](http://www.htslib.org/download/), then: 
+```
+> cd bcftools-1.14    # and similarly for bcftools and htslib
+> ./configure --prefix=/Users/taehyo/Applications/
+> make
+> make install
+```
+Download Pre-imputation Checker for 1000G/HRC reference panel (optional)
+```
+> curl -L -O https://www.well.ox.ac.uk/~wrayner/tools/HRC-1000G-check-bim-v4.3.0.zip
+> unzip -o HRC-1000G-check-bim-v4.3.0.zip
+> curl -L -O https://ngs.sanger.ac.uk/production/hrc/HRC.r1-1/HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
+> gunzip -f HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
+```
+
+Add plink2/R/python/bcftools to PATH for convenience. 
 
 ## Assumption: You have SNP data in PLINK format
 <img src="https://github.com/kimtae55/GWAS-End-to-End-Tutorial/blob/main/figs/plink.png" width="600">
@@ -33,7 +50,7 @@ Step 1: Handle missingness per individual and per SNP: Delete individuals with m
 
 Step 2: Handle sex discrepancy: Subjects who were a priori determined as females must have a F value of <0.2, and subjects who were a priori determined as males must have a F value >0.8. This F value is based on the X chromosome inbreeding (homozygosity) estimate. Subjects who do not fulfil these requirements are flagged "PROBLEM" by PLINK.
 ```
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_3 --check-sex 
+> plink2 --bfile ADNI_cluster_01_forward_757LONI_3 --check-sex max-female-xf=0.2 min-male-xf=0.8
 > Rscript --no-save gender_check.R # Visualize sex dicrepancy check
 > grep "PROBLEM" plink2.sexcheck| awk '{print$1,$2}'> sex_discrepancy.txt
 > plink2 --bfile ADNI_cluster_01_forward_757LONI_3 --remove sex_discrepancy.txt --make-bed --out ADNI_cluster_01_forward_757LONI_4 
@@ -80,7 +97,7 @@ plink2 --bfile ADNI_cluster_01_forward_757LONI_8 --keep unrelated.keep --make-be
 
 ### Liftover and Imputation:
 
-Step 1: ADNI datasets are often on older genome builds (e.g., hg18/NCBI36). Before imputation, convert to hg19/GRCh37. This ensures all datasets use the same genome coordinates, resulting in .bed/.bim/.fam files aligned to GRCh37. 
+Step 1: ADNI datasets are often on older genome builds (e.g., hg18/NCBI36). Before imputation, convert to hg19/GRCh37. This ensures all datasets use the same genome coordinates, resulting in .bed/.bim/.fam files aligned to GRCh37. You could also lift to hg38, which is the most current reference genome build, but I choose hg19 because it is easier to validate against existing works (e.g [doi:10.1016/j.neurobiolaging.2019.06.003](https://pmc.ncbi.nlm.nih.gov/articles/PMC6732252/), [doi: 10.1186/s12880-025-01782-2](https://pubmed.ncbi.nlm.nih.gov/40676546/))
 ```
 # Check for original build
 > plink2 --bfile ADNI_cluster_01_forward_757LONI_10 --chr 1 --recode vcf bgz --out ADNI_cluster_01_forward_757LONI_11_chr1
@@ -132,11 +149,6 @@ We usually do a PCA step here to decide which reference panel our dataset is mos
 
 Step 2: Pre-imputation Correction given reference panel (HRC/1000G) 
 ```
-> curl -L -O https://www.well.ox.ac.uk/~wrayner/tools/HRC-1000G-check-bim-v4.3.0.zip
-> unzip -o HRC-1000G-check-bim-v4.3.0.zip
-> curl -L -O https://ngs.sanger.ac.uk/production/hrc/HRC.r1-1/HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
-> gunzip -f HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz
-
 > plink2 --bfile ADNI_cluster_01_forward_757LONI_12 --chr 1-22 --make-bed --out ADNI_cluster_01_forward_757LONI_12_auto
 > plink2 --bfile ADNI_cluster_01_forward_757LONI_12_auto --freq --out ADNI_cluster_01_forward_757LONI_12_auto
 > awk 'BEGIN{OFS=" "}
@@ -149,11 +161,11 @@ Step 2: Pre-imputation Correction given reference panel (HRC/1000G)
        if (af <= 0.5) { a1=alt; a2=ref; maf=af } else { a1=ref; a2=alt; maf=1-af }
        nchr = 2 * (n + 0);
        printf "%s %s %s %s %.6f %d\n", chr, id, a1, a2, maf, nchr
-     }' ADNI_cluster_01_forward_757LONI_12_auto_withIDs.afreq > ADNI_cluster_01_forward_757LONI_12_auto.frq
+     }' ADNI_cluster_01_forward_757LONI_12_auto.afreq > ADNI_cluster_01_forward_757LONI_12_auto.frq
 # Sanity check for correct conversion
 # Expect large overlap (tens of thousands), not single digits.
 > cut -d' ' -f2 ADNI_cluster_01_forward_757LONI_12_auto.frq       | sort -u > frq_ids.txt
-> awk '{print $2}' ADNI_cluster_01_forward_757LONI_12_auto_withIDs.bim | sort -u > bim_ids.txt
+> awk '{print $2}' ADNI_cluster_01_forward_757LONI_12_auto.bim | sort -u > bim_ids.txt
 > comm -12 frq_ids.txt bim_ids.txt | wc -l
 > perl HRC-1000G-check-bim.pl -b ADNI_cluster_01_forward_757LONI_12_auto.bim -f ADNI_cluster_01_forward_757LONI_12_auto.frq -r HRC.r1-1.GRCh37.wgs.mac5.sites.tab -h
 > chmod +x Run-plink.sh
@@ -164,23 +176,21 @@ At this point, we have *chr1.vcf to *chr22.vcf
 Step 4: Imputation via Michigan Imputation Server
 We will convert the plink data to vcf format, then use the MIS to impute data. 
 ```
-# Download BCFtools (bcftools-1.14) from http://www.htslib.org/download/
-> cd bcftools-1.14    # and similarly for bcftools and htslib
-> ./configure --prefix=/Users/taehyo/Applications/
-> make
-> make install
-> export PATH=/Users/taehyo/Applications/bin:$PATH```
-
 > for chr in {1..22}
 do
 	bcftools sort ADNI_cluster_01_forward_757LONI_12_auto-updated-chr$chr.vcf -Oz -o ADNI_cluster_01_forward_757LONI_12_auto-updated-chr$chr.vcf.gz
 done
 
+> for chr in {1..22}
+do
+    echo "chr${chr}: $(bcftools view -H ADNI_cluster_01_forward_757LONI_12_auto-updated-chr${chr}.vcf.gz | wc -l) variants"
+done
+
 # Now upload to Michigan Imputation Server for imputation: https://imputationserver.sph.umich.edu/index.html#!pages/login
 
-> for chr in $(seq 1 22)
+> for chr in $(seq 1 22)   
 do
-	unzip -P 2kFzKqy7lKa1GR chr_$chr.zip
+    unzip -P 'PASSWORD FROM EMAIL' chr_${chr}.zip
 done
 
 > bcftools concat chr1.dose.vcf.gz chr2.dose.vcf.gz chr3.dose.vcf.gz chr4.dose.vcf.gz chr5.dose.vcf.gz chr6.dose.vcf.gz chr7.dose.vcf.gz chr8.dose.vcf.gz chr9.dose.vcf.gz chr10.dose.vcf.gz chr11.dose.vcf.gz chr12.dose.vcf.gz chr13.dose.vcf.gz chr14.dose.vcf.gz chr15.dose.vcf.gz chr16.dose.vcf.gz chr17.dose.vcf.gz chr18.dose.vcf.gz chr19.dose.vcf.gz chr20.dose.vcf.gz chr21.dose.vcf.gz chr22.dose.vcf.gz -Ou | 
@@ -192,7 +202,9 @@ bcftools annotate -Oz -x ID -I +'%CHROM:%POS:%REF:%ALT' -o ADNI1_allchromosomes.
 
 ### Population Structure Modeling:
 
-I repeat the above steps for ADNI1, ADNI2, and ADNIGO. If you only have a single dataset, you can skip the below merge process. 
+At this moment, I have ADNI1/GO/2 imputed with the HRC r1.1 (hg19) panel, which is European-centric. I assess ancestry and adjust for population structure by anchoring PCA to an external reference panel (HapMap3 or 1000G) which has more coverage beyond European ancestry. I compute allele-weighted PCs on the combined ADNI + external reference dataset so the axes reflect global ancestry, then project each ADNI cohort onto this shared PC space. Correct clustering is confirmed when ADNI samples group tightly with European reference populations (e.g., CEU/TSI), while outliers are identified if they drift toward non-European clusters. I will utilize the samples that align well with the HRC r1.1 (hg19) panel. The top 10 PCs are also saved to be included later as covariates for GWAS. 
+```
+```
 
 (Optional Step): If you have multiple datasets, merge all of them now that they are aligned and imputed on the same genome build, followed by final post-merge quality check. 
 ```
