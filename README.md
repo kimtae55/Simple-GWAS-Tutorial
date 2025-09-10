@@ -20,12 +20,6 @@ Download BCFtools (bcftools-1.14) from [http://www.htslib.org/download/](http://
 > make
 > make install
 ```
-Download Pre-imputation Checker for 1000G/HRC reference panel (optional): [https://www.chg.ox.ac.uk/~wrayner/tools ](https://www.chg.ox.ac.uk/~wrayner/tools/)
-```
-> curl -L -O https://www.well.ox.ac.uk/~wrayner/tools/HRC-1000G-check-bim-v4.3.0.zip
-> unzip -o HRC-1000G-check-bim-v4.3.0.zip
-```
-
 
 Add plink2/R/python/bcftools to PATH for convenience. 
 
