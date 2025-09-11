@@ -169,7 +169,7 @@ plink2 --bfile "${base}_8" \
 
 ### Liftover and Imputation:
 
-Step 1: ADNI datasets are often on older genome builds (e.g., hg18/NCBI36). Before imputation, convert to hg19/GRCh37. This ensures all datasets use the same genome coordinates, resulting in .bed/.bim/.fam files aligned to GRCh37. You could also lift to hg38, which is the most current reference genome build, but I choose hg19 because it is easier to validate against existing works (e.g [doi:10.1016/j.neurobiolaging.2019.06.003](https://pmc.ncbi.nlm.nih.gov/articles/PMC6732252/), [doi: 10.1186/s12880-025-01782-2](https://pubmed.ncbi.nlm.nih.gov/40676546/))
+Step 1: ADNI datasets are often on older genome builds (e.g., hg18/NCBI36). Before imputation, convert to GRCh38/hg38. This ensures all datasets use the same genome coordinates, resulting in .bed/.bim/.fam files aligned to GRCh38/hg38. If your data is already aligned to GRCh38/hg38, skip this step.
 ```
 # Step 1. Export chr1 VCF to check genome build
 plink2 --bfile "${base}_10" \
