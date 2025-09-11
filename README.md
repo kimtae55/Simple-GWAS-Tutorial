@@ -283,8 +283,23 @@ bcftools annotate -Oz -x ID -I +'%CHROM:%POS:%REF:%ALT' -o ADNI1_allchromosomes.
 
 ### Population Structure Modeling:
 
-At this moment, I have ADNI1/GO/2 imputed with the HRC r1.1 (hg19) panel, which is European-centric. I assess ancestry and adjust for population structure by anchoring PCA to an external reference panel (HapMap3 or 1000G) which has more coverage beyond European ancestry. I compute allele-weighted PCs on the combined ADNI + external reference dataset so the axes reflect global ancestry, then project each ADNI cohort onto this shared PC space. Correct clustering is confirmed when ADNI samples group tightly with European reference populations (e.g., CEU/TSI), while outliers are identified if they drift toward non-European clusters. I will utilize the samples that align well with the HRC r1.1 (hg19) panel. The top 10 PCs are also saved to be included later as covariates for GWAS. 
+At this point, I have ADNI1/GO/2 imputed with the TopMed reference panel. I assess ancestry and adjust for population structure by anchoring PCA to an external reference panel (HapMap3 or 1000G). I compute allele-weighted PCs on the combined ADNI + external reference dataset so the axes reflect global ancestry, then project each ADNI cohort onto this shared PC space. The top 10 PCs are saved to be included later as covariates for GWAS. 
 ```
+# Download 1000G reference panel 
+BASE_URL="http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20201028_3202_phased"
+
+# Per-chromosome VCFs + index
+for chr in $(seq 1 22); do
+  f="CCDG_14151_B01_GRM_WGS_2020-08-05_chr${chr}.filtered.shapeit2-duohmm-phased.vcf.gz"
+  curl -fL -C - -O "${BASE_URL}/${f}"
+  curl -fL -C - -O "${BASE_URL}/${f}.tbi"
+done
+
+# Population panel (sample -> pop -> super-pop)
+curl -fL -o integrated_call_samples_v3.20130502.ALL.panel \
+  "https://bochet.gcc.biostat.washington.edu/beagle/1000_Genomes_phase3_v5a/sample_info/integrated_call_samples_v3.20130502.ALL.panel"
+
+
 ```
 
 (Optional Step): If you have multiple datasets, merge all of them now that they are aligned and imputed on the same genome build, followed by final post-merge quality check. 
