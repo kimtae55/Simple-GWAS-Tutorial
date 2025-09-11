@@ -30,7 +30,7 @@ In terminal, define your base file name (string that precedes your .bed, .bim, .
 base="ADNI_cluster_01_forward_757LONI"
 ```
 
-## What are the necessary steps in a GWAS?
+## What are the necessary steps in GWAS?
 
 ### Quality Control --> Liftover and Imputation --> Population Structure Modeling --> Associative Analysis 
 
@@ -267,9 +267,9 @@ done
 ```
 At this point, we have *chr1.vcf to *chr22.vcf
 
-Step 4: Imputation via Michigan Imputation Server
+Step 4: Imputation via TopMed Imputation Server
 ```
-# Now upload to Michigan Imputation Server for imputation: https://imputationserver.sph.umich.edu/index.html#!pages/login
+# Now upload to TopMed Imputation Server for imputation: [https://imputation.biodatacatalyst.nhlbi.nih.gov/#!run/imputationserver%402.0.0-beta3](https://imputation.biodatacatalyst.nhlbi.nih.gov/#!run/imputationserver%402.0.0-beta3)
 
 > for chr in $(seq 1 22)   
 do
