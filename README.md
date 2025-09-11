@@ -5,26 +5,30 @@ Credits for the figures and explanations here go to the more in-depth tutorials:
 You can replace my data with your own plink data (.bed, .bim, .fam) and replicate the whole experiment. 
 - If you plan to use GRCh37/hg19 genome build, follow instructions [here](https://github.com/kimtae55/Simple-GWAS-Tutorial/tree/main/GRCh37_hg19).
 - If you plan to use GRCh38/hg38 genome build, stay on this page.
+- For research, GRCh38/hg38 is recommended as it is the most up-to-date human genome build (released 2013). 
 
 At the end of the tutorial, I provide an application example of using the extracting SNPs and additional FDG-PET data to conduct an imaging-genetics sparse canonical correlation analysis. 
 
 ## Prerequisites
-You need to have the following installed: ```plink2, R, python```
-
-Download BCFtools (bcftools-1.14) from [http://www.htslib.org/download/](http://www.htslib.org/download/), then: 
+- Install ```plink2, R, python```
+- Install BCFtools (bcftools-1.14) from [http://www.htslib.org/download/](http://www.htslib.org/download/), then: 
 ```
 > cd bcftools-1.14    # and similarly for bcftools and htslib
 > ./configure --prefix=/Users/taehyo/Applications/
 > make
 > make install
 ```
-
-Add plink2/R/python/bcftools to PATH for convenience. 
+- Note: Add above executables to $PATH for convenience. 
 
 ## Assumption: You have SNP data in PLINK format
 <img src="https://github.com/kimtae55/GWAS-End-to-End-Tutorial/blob/main/figs/plink.png" width="600">
 
 In my case, I use Plink data (.bed, .bim, .fam files) downloaded from the ADNI1, ADNI2, and ADNIGO studies. For simplicity, all data, scripts, and outputs will be located in a single working directory. 
+
+In terminal, define your base file name (string that precedes your .bed, .bim, .fam filenames)
+```
+base="ADNI_cluster_01_forward_757LONI"
+```
 
 ## What are the necessary steps in a GWAS?
 
@@ -37,9 +41,6 @@ If you have multiple datasets from different studies/timepoints, you should run 
 
 Step 1: Handle missingness per individual and per SNP: Delete individuals with missingness >0.05.
 ```
-# Define the base file name
-base="ADNI_cluster_01_forward_757LONI"
-
 # Step 1. Visualize missingness
 plink2 --bfile "$base" --missing
 Rscript --no-save hist_miss.R
@@ -144,22 +145,22 @@ plink2 --bfile "${base}_7" \
 
 Step 6: We exclude all individuals with a PI_HAT > 0.2 to remove cryptic relatedness, assuming a random population sample.
 ```
-# 1) LD-prune SNPs (used only for relatedness detection)
+# Step 1. LD-prune SNPs (used only for relatedness detection)
 plink2 --bfile "${base}_8" \
        --indep-pairwise 200 100 0.1 \
        --out indepSNP
 
-# 2) Use pruned SNPs to identify related individuals (temporary dataset)
+# Step 2. Use pruned SNPs to identify related individuals (temporary dataset)
 plink2 --bfile "${base}_8" \
        --extract indepSNP.prune.in \
        --king-cutoff 0.10 \
        --make-bed \
        --out ADNI_relcheck_tmp
 
-# 3) Save list of unrelated individuals
+# Step 3. Save list of unrelated individuals
 awk '{print $1, $2}' ADNI_relcheck_tmp.fam > unrelated.keep
 
-# 4) Apply unrelated sample list to full dataset (keeps all SNPs, drops related individuals)
+# Step 4. Apply unrelated sample list to full dataset (keeps all SNPs, drops related individuals)
 plink2 --bfile "${base}_8" \
        --keep unrelated.keep \
        --make-bed \
