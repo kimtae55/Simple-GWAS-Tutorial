@@ -2,13 +2,11 @@
 This is a Step by Step Tutorial for GWAS (for Plink format), explaining what SNP data looks like, how to perform quality control and imputation procedures, and how to run GWAS.
 Credits for the figures and explanations here go to the more in-depth tutorials: [GWASTutorial1](https://cloufield.github.io/GWASTutorial), [GWASTutorial2](https://www.ncbi.nlm.nih.gov/pubmed/29484742), or [GWASTutorial3](https://pmc.ncbi.nlm.nih.gov/articles/PMC6001694/). Most of the codes are taken from [https://github.com/MareesAT/GWA_tutorial](https://github.com/MareesAT/GWA_tutorial), but modified to be compatible with plink2 (for macbook m1 and above users). 
 
-I aggregate all components of GWAS into one repository for study purposes, and to clear the confusion of what to download and when/how to run certain scripts. This means that you can replace my data with your .bed, .bim, .fam files and replicate the whole experiment. 
+You can replace my data with your own plink data (.bed, .bim, .fam) and replicate the whole experiment. 
+- If you plan to use GRCh37/hg19 genome build, follow instructions [here](https://github.com/kimtae55/Simple-GWAS-Tutorial/tree/main/GRCh37_hg19).
+- If you plan to use GRCh38/hg38 genome build, stay on this page.
 
-If you plan to use GRCh37/hg19 genome build, follow instructions [here](https://github.com/kimtae55/Simple-GWAS-Tutorial/tree/main/GRCh37_hg19).
-
-If you plan to use GRCh38/hg38 genome build, stay on this page.
-
-The output is a genotype matrix of shape (n x p), where n is the number of subjects, and p is the number of SNPs extracted from GWAS. At the end of the tutorial is an application example of how one can utilize the processed SNP data.
+At the end of the tutorial, I provide an application example of using the extracting SNPs and additional FDG-PET data to conduct an imaging-genetics sparse canonical correlation analysis. 
 
 ## Prerequisites
 You need to have the following installed: ```plink2, R, python```
