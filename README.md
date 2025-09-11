@@ -267,10 +267,8 @@ done
 ```
 At this point, we have *chr1.vcf to *chr22.vcf
 
-Step 4: Imputation via TopMed Imputation Server
+Step 4: Upload to TopMed Imputation Server ([https://imputation.biodatacatalyst.nhlbi.nih.gov/#!run/imputationserver%402.0.0-beta3](https://imputation.biodatacatalyst.nhlbi.nih.gov/#!run/imputationserver%402.0.0-beta3)) for imputation. Once completed:
 ```
-# Now upload to TopMed Imputation Server for imputation: [https://imputation.biodatacatalyst.nhlbi.nih.gov/#!run/imputationserver%402.0.0-beta3](https://imputation.biodatacatalyst.nhlbi.nih.gov/#!run/imputationserver%402.0.0-beta3)
-
 > for chr in $(seq 1 22)   
 do
     unzip -P 'PASSWORD FROM EMAIL' chr_${chr}.zip
