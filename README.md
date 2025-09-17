@@ -250,19 +250,21 @@ plink2 --bfile "${base}_12" \
        --make-bed \
        --out "${base}_12_auto"
 
-# Step 2. Export per-chromosome, bgzipped VCF files (ready for imputation)
-for chr in {1..22}
-do
+# Step 2. Export per-chromosome, bgzipped VCF files with chr-prefix (hg38 style)
+for chr in {1..22}; do
   plink2 \
     --bfile "${base}_12_auto" \
     --chr "$chr" \
+    --output-chr chrM \
     --recode vcf bgz \
-    --out "${base}_12_auto-updated-chr${chr}"
+    --out "${base}_12_auto-chr${chr}"
+  tabix -f "${base}_12_auto-chr${chr}.vcf.gz"
 done
 
-# Check SNPs exist
+# Quick check: CHROM should be chr1..chr22
 for chr in {1..22}; do
-  echo "chr${chr}: $(bcftools view -H "${base}_12_auto-updated-chr${chr}.vcf.gz" | wc -l) variants"
+  echo -n "chr${chr}: "
+  bcftools view -H "${base}_12_auto-chr${chr}.vcf.gz" | awk '{print $1}' | head -1
 done
 ```
 At this point, we have *chr1.vcf to *chr22.vcf
