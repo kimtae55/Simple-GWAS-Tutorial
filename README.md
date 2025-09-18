@@ -268,6 +268,7 @@ for chr in {1..22}; do
 done
 
 # modify make_topmed_ready.sh to set the correct $base, $REF_FASTA
+# You can download the reference fasta file (hg38.analysisSet.fa.gz) from https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/analysisSet/
 # This will fix strand flip issues and make the vcf files ready for imputation. 
 ./make_topmed_ready.sh
 ```
