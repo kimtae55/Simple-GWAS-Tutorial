@@ -266,10 +266,14 @@ for chr in {1..22}; do
   echo -n "chr${chr}: "
   bcftools view -H "${base}_12_auto-chr${chr}.vcf.gz" | awk '{print $1}' | head -1
 done
-```
-At this point, we have *chr1.vcf to *chr22.vcf
 
-Step 4: Upload to TopMed Imputation Server ([https://imputation.biodatacatalyst.nhlbi.nih.gov/#!run/imputationserver%402.0.0-beta3](https://imputation.biodatacatalyst.nhlbi.nih.gov/#!run/imputationserver%402.0.0-beta3)) for imputation. Once completed:
+# modify make_topmed_ready.sh to set the correct $base, $REF_FASTA
+# This will fix strand flip issues and make the vcf files ready for imputation. 
+./make_topmed_ready.sh
+```
+At this point, you have *-chr1.topmed.vcf.gz, ..., *-chr22.topmed.vcf.gz ready for imputation. 
+
+Step 4: Upload the above vcfs to TopMed Imputation Server ([https://imputation.biodatacatalyst.nhlbi.nih.gov/#!run/imputationserver%402.0.0-beta3](https://imputation.biodatacatalyst.nhlbi.nih.gov/#!run/imputationserver%402.0.0-beta3)) for imputation. Once completed:
 ```
 > for chr in $(seq 1 22)   
 do
