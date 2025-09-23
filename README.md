@@ -428,6 +428,13 @@ plink2 --threads 1 --memory 8000 --bfile ADNI_qc_final --exclude range high-LD-r
 plink2 --threads 1 --memory 8000 --bfile ADNI_qc_final --extract indepSNP_pca.prune.in --pca 20 approx --out ADNI_pca
 ```
 
+Because the APOE4 allele is determined by a specific combination of two single nucleotide polymorphisms (SNPs): rs429358 and rs7412. For APOE4, the combination is defined by a C allele at position 19:44908684 (rs429358) and a C allele at position 19:44908822 (rs7412), I make sure my dataset contains these SNPs - I need to check again after running GWAS.
+```
+awk -F'\t' '$1==19 && ($4==44908684 || $4==44908822)' ADNI_qc_final.bim
+# 19	chr19:44908684:T:C	0	44908684	C	T
+# 19	chr19:44908822:C:T	0	44908822	T	C
+```
+
 ### Associative Analysis:
 
 Run GWAS on progression (e.g. ADAS-Cog, MMSE)
@@ -436,7 +443,6 @@ Run GWAS on progression (e.g. ADAS-Cog, MMSE)
 - race, ethnicity, education, marital status, 10 PC
 - try to maintain 300-400 SNPs? make sure p >> n 
 - response variable should be logistic (CN or AD), each regression containing 1 SNP, use pvalue threshold to retain reasonable # of SNP
-- this is more straightforward to see rather than using other response variables
 - then, before SCCA, do linear regression (regress out the same covariates, and then i
 - check if our snp data contains SNP for APOE4 (double check)
 - for FDG PET, take the average across each ROI, then regress 
