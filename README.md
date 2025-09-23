@@ -366,7 +366,60 @@ plink2 --threads $THREADS --memory $MEM --bfile ADNI_merged_2 --snps-only --make
 
 ```
 
-Step 1: Population stratification is corrected by extracting principal components (PCs) for each dataset separately using LD-pruned SNPs. The top PCs are used as covariates in GWAS to control for ancestry differences. 
+Step 1: Post Imputation/Merge QC
+```
+# ---------- restore sex from original fams (FID_IID -> SEX) ----------
+awk '{if($5==1||$5==2) print $1"_"$2, $5}' ADNI_1/ADNI_cluster_01_forward_757LONI_11.fam > fid_iid_sex.map
+awk '{if($5==1||$5==2) print $1"_"$2, $5}' ADNI_GO_2_SET_1/ADNI_GO_2_Forward_Bin_11.fam >> fid_iid_sex.map
+awk '{if($5==1||$5==2) print $1"_"$2, $5}' ADNI_GO_2_SET_2/ADNI_GO2_GWAS_2nd_orig_BIN_11.fam >> fid_iid_sex.map
+awk 'NR==FNR{m[$1]=$2; next} {iid=$2; if(iid in m) print $1, $2, m[iid]}' fid_iid_sex.map ADNI_merged_snps.fam > sex_update_resolved.txt
+
+plink2 --threads 1 --memory 8000 --bfile ADNI_merged_snps --update-sex sex_update_resolved.txt --make-bed --out ADNI_qc1
+awk '{print $5}' ADNI_qc1.fam | sort | uniq -c
+
+# ---------- restore sex from original fams (FID_IID -> SEX) ----------
+awk '{if($5==1||$5==2) print $1"_"$2, $5}' ADNI_1/ADNI_cluster_01_forward_757LONI_11.fam > fid_iid_sex.map
+awk '{if($5==1||$5==2) print $1"_"$2, $5}' ADNI_GO_2_SET_1/ADNI_GO_2_Forward_Bin_11.fam >> fid_iid_sex.map
+awk '{if($5==1||$5==2) print $1"_"$2, $5}' ADNI_GO_2_SET_2/ADNI_GO2_GWAS_2nd_orig_BIN_11.fam >> fid_iid_sex.map
+awk 'NR==FNR{m[$1]=$2; next} {iid=$2; if(iid in m) print $1, $2, m[iid]}' fid_iid_sex.map ADNI_merged_snps.fam > sex_update_resolved.txt
+
+plink2 --threads 1 --memory 8000 --bfile ADNI_merged_snps --update-sex sex_update_resolved.txt --make-bed --out ADNI_qc1
+awk '{print $5}' ADNI_qc1.fam | sort | uniq -c
+
+# ---------- missingness ----------
+plink2 --threads 1 --memory 8000 --bfile ADNI_qc1 --missing --out ADNI_qc1_miss
+plink2 --threads 1 --memory 8000 --bfile ADNI_qc1 --geno 0.05 --make-bed --out ADNI_qc2
+plink2 --threads 1 --memory 8000 --bfile ADNI_qc2 --mind 0.05 --make-bed --out ADNI_qc3
+
+# ---------- autosomes only + MAF ----------
+awk '{ if ($1 >= 1 && $1 <= 22) print $2 }' ADNI_qc3.bim > snp_autosomes.txt
+plink2 --threads 1 --memory 8000 --bfile ADNI_qc3 --extract snp_autosomes.txt --make-bed --out ADNI_qc4
+plink2 --threads 1 --memory 8000 --bfile ADNI_qc4 --freq --out ADNI_maf
+plink2 --threads 1 --memory 8000 --bfile ADNI_qc4 --maf 0.01 --make-bed --out ADNI_qc5
+
+# ---------- HWE ----------
+plink2 --threads 1 --memory 8000 --bfile ADNI_qc5 --hardy --out ADNI_hwe
+plink2 --threads 1 --memory 8000 --bfile ADNI_qc5 --hwe 1e-6 --make-bed --out ADNI_qc6
+
+# ---------- heterozygosity outliers (hg38 long-range LD mask) ----------
+plink2 --threads 1 --memory 8000 --bfile ADNI_qc6 --exclude range high-LD-regions-hg38-GRCh38.txt --indep-pairwise 50 5 0.2 --out indepSNP
+plink2 --threads 1 --memory 8000 --bfile ADNI_qc6 --extract indepSNP.prune.in --het --out ADNI_het
+# Create het_fail_ind.txt from ADNI_het.het (your usual R/awk); if it exists, remove:
+if [ -s het_fail_ind.txt ]; then
+  plink2 --threads 1 --memory 8000 --bfile ADNI_qc6 --remove het_fail_ind.txt --make-bed --out ADNI_qc7
+else
+  cp ADNI_qc6.bed ADNI_qc7.bed; cp ADNI_qc6.bim ADNI_qc7.bim; cp ADNI_qc6.fam ADNI_qc7.fam
+fi
+
+# ---------- relatedness (automatic prune; no manual PI_HAT picks) ----------
+plink2 --threads 1 --memory 8000 --bfile ADNI_qc7 --indep-pairwise 200 100 0.1 --out indepSNP_rel
+plink2 --threads 1 --memory 8000 --bfile ADNI_qc7 --extract indepSNP_rel.prune.in --king-cutoff 0.10 --make-bed --out ADNI_rel_unrelated_tmp
+awk '{print $1, $2}' ADNI_rel_unrelated_tmp.fam > unrelated.keep
+plink2 --threads 1 --memory 8000 --bfile ADNI_qc7 --keep unrelated.keep --make-bed --out ADNI_qc_final
+```
+Now, we can finally proceed to population stratification and gwas using the ADNI_qc_final dataset
+
+Step 2: Population stratification is corrected by extracting principal components (PCs) for each dataset separately using LD-pruned SNPs. The top PCs are used as covariates in GWAS to control for ancestry differences. 
 ```
 > plink2 --bfile ADNI_cluster_01_forward_757LONI_14 --exclude range high-LD-regions-hg19-GRCh37.txt --indep-pairwise 50 5 0.2 --out pruned_data
 > plink2 --bfile ADNI_cluster_01_forward_757LONI_14 --extract pruned_data.prune.in --make-bed --out ADNI_cluster_01_forward_757LONI_14_pruned
