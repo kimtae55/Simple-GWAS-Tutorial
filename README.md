@@ -313,6 +313,9 @@ curl -fL -o integrated_call_samples_v3.20130502.ALL.panel \
 
 (Optional Step): If you have multiple datasets, merge all of them now that they are aligned and imputed on the same genome build, followed by final post-merge quality check. 
 ```
+THREADS=1
+MEM=8000
+
 echo "[1/6] Build intersect of SNP IDs across all three (BIM col2)..."
 awk '{print $2}' ADNI1_allchromosomes.converted.R2_0.3.bim     | sort -u > ids_1.txt
 awk '{print $2}' ADNI2_SET1_allchromosomes.converted.R2_0.3.bim | sort -u > ids_2.txt
