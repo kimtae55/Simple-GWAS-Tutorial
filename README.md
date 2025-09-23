@@ -421,17 +421,11 @@ Now, we can finally proceed to population stratification and gwas using the ADNI
 
 Step 2: Population stratification is corrected by extracting principal components (PCs) for each dataset separately using LD-pruned SNPs. The top PCs are used as covariates in GWAS to control for ancestry differences. 
 ```
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_14 --exclude range high-LD-regions-hg19-GRCh37.txt --indep-pairwise 50 5 0.2 --out pruned_data
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_14 --extract pruned_data.prune.in --make-bed --out ADNI_cluster_01_forward_757LONI_14_pruned
-> plink2 --bfile ADNI_cluster_01_forward_757LONI_14_pruned --pca 10 --out ADNI1_PCA
+# LD prune (exclude long-range LD regions on hg38 to avoid correlated SNPs)
+plink2 --threads 1 --memory 8000 --bfile ADNI_qc_final --exclude range high-LD-regions-hg38-GRCh38.txt --indep-pairwise 200 100 0.1 --out indepSNP_pca
 
-> plink2 --bfile ADNI_GO2_10 --exclude range high-LD-regions-hg19-GRCh37.txt --indep-pairwise 50 5 0.2 --out pruned_data
-> plink2 --bfile ADNI_GO2_10 --extract pruned_data.prune.in --make-bed --out ADNI_GO2_10_pruned
-> plink2 --bfile ADNI_GO2_10_pruned --pca 10 --out ADNIGO2_PCA
-
-> plink2 --bfile ADNI3_SNP_10 --exclude range high-LD-regions-hg19-GRCh37.txt --indep-pairwise 50 5 0.2 --out pruned_data
-> plink2 --bfile ADNI3_SNP_10 --extract pruned_data.prune.in --make-bed --out ADNI3_SNP_10_pruned
-> plink2 --bfile ADNI3_SNP_10_pruned --pca 10 --out ADNI3_PCA
+# PCA using pruned SNPs
+plink2 --threads 1 --memory 8000 --bfile ADNI_qc_final --extract indepSNP_pca.prune.in --pca 20 approx --out ADNI_pca
 ```
 
 ### Associative Analysis:
