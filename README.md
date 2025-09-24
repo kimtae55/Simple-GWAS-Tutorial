@@ -437,7 +437,26 @@ awk -F'\t' '$1==19 && ($4==44908684 || $4==44908822)' ADNI_qc_final.bim
 
 ### Associative Analysis:
 
-Run GWAS on progression (e.g. ADAS-Cog, MMSE)
+Stats on the Data:
+```
+== Phase distribution (COLPROT) among matched-in-both (baseline only) ==
+   COLPROT     N    pct
+    <char> <int> <char>
+1:   ADNI2   344  55.3%
+2:   ADNI1   261  42.0%
+3:  ADNIGO    17   2.7%
+
+== Baseline diagnosis distribution (DX_bl) among matched-in-both (baseline only) ==
+    DX_bl     N    pct
+   <char> <int> <char>
+1:     CN   234  37.6%
+2:     AD   201  32.3%
+3:   LMCI   149  24.0%
+4:   EMCI    38   6.1%
+```
+This means that I should use ADNI1/ADNIGO/ADNI2 as dummy variables, and CN/MCI/AD as disease groups for later analyses (EMCI has too little samples)
+
+Run GWAS on progression:
 - dummy variables of adni cohort (adni1, adni2, adnigo)
 - gender, age
 - race, ethnicity, education, marital status, 10 PC
