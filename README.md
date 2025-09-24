@@ -456,6 +456,67 @@ Stats on the Data:
 ```
 This means that I should use ADNI1/ADNIGO/ADNI2 as dummy variables, and CN/MCI/AD as disease groups for later analyses (EMCI has too little samples)
 
+We want to control for the following covariates: study phase, gender, age, race, ethnicity, education, marital status, top 10 PC
+```
+**ID variables**
+- `FID`, `IID`: Family and Individual IDs from PLINK `.fam`.  
+  (Used to align covariates with genotype data.)
+
+---
+
+**Demographics / Covariates**
+- `SEX`: Binary sex code (from PLINK `.fam`).  
+  - `1` = Male  
+  - `0` = Female  
+  - `NA` = Unknown / missing
+
+- `AGE`: Age at baseline visit (years, numeric).  
+  - Continuous variable.
+
+- `PTEDUCAT`: Years of education.  
+  - Example: `12` = high school, `16` = college, `18` = graduate school.  
+  - Continuous variable.
+
+---
+
+**Cohort / Study Phase (COLPROT)**  
+Baseline = **ADNI1**  
+Dummy variables created for the following categories:
+- `COHORT_ADNIGO` = 1 if ADNIGO, 0 otherwise  
+- `COHORT_ADNI2`  = 1 if ADNI2, 0 otherwise  
+- (`ADNI1` is the reference)
+
+---
+
+**Race (PTRACCAT)**  
+Baseline = **White**  
+Dummy variables created for the following categories:
+- `RACE_BLACK`       = 1 if Black, 0 otherwise  
+- `RACE_ASIAN`       = 1 if Asian, 0 otherwise  
+- `RACE_AMERICANIND` = 1 if American Indian/Alaska Native, 0 otherwise  
+- `RACE_MORETHAN1`   = 1 if More than one race, 0 otherwise  
+- (Reference = White)
+
+---
+
+**Ethnicity (PTETHCAT)**  
+Baseline = **Not Hisp/Latino**  
+Dummy variables created for the following categories:
+- `ETH_HISPANIC` = 1 if Hisp/Latino, 0 otherwise  
+- (Reference = Not Hisp/Latino)
+
+---
+
+**Marital Status (PTMARRY)**  
+Baseline = **Married**  
+Dummy variables created for the following categories:
+- `MAR_DIVORCED` = 1 if Divorced, 0 otherwise  
+- `MAR_NEVERMARRIED` = 1 if Never married, 0 otherwise  
+- `MAR_WIDOWED` = 1 if Widowed, 0 otherwise  
+- `MAR_UNKNOWN` = 1 if Unknown / Other, 0 otherwise  
+- (Reference = Married)
+```
+
 Run GWAS on progression:
 - dummy variables of adni cohort (adni1, adni2, adnigo)
 - gender, age
