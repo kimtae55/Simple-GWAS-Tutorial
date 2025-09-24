@@ -466,7 +466,6 @@ We want to control for the following covariates: study phase, gender, age, race,
 - `SEX`: Binary sex code (from PLINK `.fam`).  
   - `1` = Male  
   - `0` = Female  
-  - `NA` = Unknown / missing
 
 - `AGE`: Age at baseline visit (years, numeric).  
   - Continuous variable.
