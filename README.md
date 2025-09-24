@@ -462,8 +462,6 @@ We want to control for the following covariates: study phase, gender, age, race,
 - `FID`, `IID`: Family and Individual IDs from PLINK `.fam`.  
   (Used to align covariates with genotype data.)
 
----
-
 **Demographics / Covariates**
 - `SEX`: Binary sex code (from PLINK `.fam`).  
   - `1` = Male  
@@ -477,16 +475,12 @@ We want to control for the following covariates: study phase, gender, age, race,
   - Example: `12` = high school, `16` = college, `18` = graduate school.  
   - Continuous variable.
 
----
-
 **Cohort / Study Phase (COLPROT)**  
 Baseline = **ADNI1**  
 Dummy variables created for the following categories:
 - `COHORT_ADNIGO` = 1 if ADNIGO, 0 otherwise  
 - `COHORT_ADNI2`  = 1 if ADNI2, 0 otherwise  
 - (`ADNI1` is the reference)
-
----
 
 **Race (PTRACCAT)**  
 Baseline = **White**  
@@ -497,15 +491,11 @@ Dummy variables created for the following categories:
 - `RACE_MORETHAN1`   = 1 if More than one race, 0 otherwise  
 - (Reference = White)
 
----
-
 **Ethnicity (PTETHCAT)**  
 Baseline = **Not Hisp/Latino**  
 Dummy variables created for the following categories:
 - `ETH_HISPANIC` = 1 if Hisp/Latino, 0 otherwise  
 - (Reference = Not Hisp/Latino)
-
----
 
 **Marital Status (PTMARRY)**  
 Baseline = **Married**  
