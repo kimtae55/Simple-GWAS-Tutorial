@@ -201,7 +201,7 @@ awk 'BEGIN{OFS="\t"} {print "chr"$1, $4-1, $4, $2}' \
     "${base}_10.bim" > "${base}_10_hg18.bed"
 ```
 Now go to http://genome.ucsc.edu/cgi-bin/hgLiftOver to convert from original build to GRCh38/hg38, download the lifted files.
-<img src="https://github.com/kimtae55/GWAS-End-to-End-Tutorial/blob/main/figs/liftover.png" width="600">
+<img src="https://github.com/kimtae55/GWAS-End-to-End-Tutorial/blob/main/figs/liftover.png" width="800">
 
 To convert back to PLINK format and check the build, follow the steps below:
 ```
@@ -531,6 +531,8 @@ We now visualize/select the significant SNPs using different thresholds:
 # Refer to https://cloufield.github.io/GWASTutorial/Visualization/#qc-check for different visualization techniques
 python gwaslab_plot.py 
 ```
+<img src="https://github.com/kimtae55/GWAS-End-to-End-Tutorial/blob/main/figs/gwas_mqq_plot.png" width="800">
+<img src="https://github.com/kimtae55/GWAS-End-to-End-Tutorial/blob/main/figs/gwas_chr19_region.png" width="800">
 
 
 (Optional: Preprocessing steps for Imaging Genetics SCCA application (see last section))
