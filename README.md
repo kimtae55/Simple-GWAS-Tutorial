@@ -463,32 +463,35 @@ We want to control for the following covariates: study phase, gender, age, race,
   Used to align covariates with genotype data.
 
 **Phenotype**
-- Stored separately as `DIAG01` (CN=1, AD=2, others=-9).
+- Stored separately as `DIAG01` (CN = 1, AD = 2, others = -9).
 
 **Demographics / Covariates**
-- `AGE`: Age at baseline visit (years, numeric).  
+- `AGE`: Age at baseline visit (years, numeric).
 - `PTEDUCAT`: Years of education (numeric; e.g., 12 = high school, 16 = college).
 
-**Sex (from ADNIMERGE `PTGENDER`)**
-- `PTGENDER_Female` = 1 if Female, 0 if Male.  
-  (We do **not** use the `.fam` sex code here.)
+**Sex (from `.fam`)**
+- `PTGENDER_Female` = 1 if **female**, 0 if **male**.
 
-**Race (from ADNIMERGE `PTRACCAT`)**  
-(Reference category is anyone with all race dummies = 0; typically “White”.)
-- `PTRACCAT_AmIndian`   = 1 if “Am Indian/Alaskan”, 0 otherwise  
-- `PTRACCAT_Asian`      = 1 if “Asian”, 0 otherwise  
-- `PTRACCAT_Black`      = 1 if “Black”, 0 otherwise  
-- `PTRACCAT_MoreOne`    = 1 if “More than one”, 0 otherwise  
+**Race (from `PTRACCAT`)**  
+Reference category = **White** (all race dummies = 0).
+- `PTRACCAT_AmIndian`   = 1 if American Indian/Alaska Native, else 0  
+- `PTRACCAT_Asian`      = 1 if Asian, else 0  
+- `PTRACCAT_Black`      = 1 if Black, else 0  
+- `PTRACCAT_HawaiianPI` = 1 if Native Hawaiian/Other Pacific Islander, else 0  
+- `PTRACCAT_MoreOne`    = 1 if More than one race, else 0
 
-**Ethnicity (from ADNIMERGE `PTETHCAT`)**  
-(Reference is “Not Hisp/Latino”, represented by 0.)
-- `PTETHCAT_HispLatino` = 1 if “Hisp/Latino”, 0 otherwise
+**Ethnicity (from `PTETHCAT`)**  
+Reference = **Not Hisp/Latino** (coded 0).
+- `PTETHCAT_HispLatino` = 1 if Hisp/Latino, else 0
 
-**Marital status (from ADNIMERGE `PTMARRY`)**  
-(Reference is anyone with all marital dummies = 0; typically “Married”.)
-- `PTMARRY_Divorced`     = 1 if “Divorced”, 0 otherwise  
-- `PTMARRY_Widowed`      = 1 if “Married”, 0 otherwise  
-- `PTMARRY_NeverMarried` = 1 if “Never married”, 0 otherwise
+**Marital status (from `PTMARRY`)**  
+Reference = **Married** (all marital dummies = 0).
+- `PTMARRY_Divorced`     = 1 if Divorced (code 3), else 0  
+- `PTMARRY_Widowed`      = 1 if Widowed (code 2), else 0  
+- `PTMARRY_NeverMarried` = 1 if Never married (code 4), else 0
+
+**Ancestry PCs**
+- `PC1`–`PC10`: Top 10 principal components from genotype PCA (numeric).
 ```
 
 Run GWAS on progression:
