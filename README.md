@@ -12,11 +12,11 @@ You can replace my data with your own plink data (.bed, .bim, .fam) and replicat
 At the end of the tutorial, I provide an application example of using the extracting SNPs and additional FDG-PET data to conduct an imaging-genetics sparse canonical correlation analysis. 
 
 ## Table of Contents
-* [Setup](#prerequisites)
-* [GWAS Step 1: Pre-imputation QC](#what-are-the-necessary-steps-in-gwas?)
-* [GWAS Step 2: Liftover and Imputation](#liftover-and-imputation)
-* [GWAS Step 3: Population Structure Modeling, Merging, and Post Imputation QC](#population-structure-modeling)
-* [GWAS Step 4: Associative Analysis](#associative-analysis)
+1. [Setup](#prerequisites)
+2. [GWAS Step 1: Pre-imputation QC](#what-are-the-necessary-steps-in-gwas?)
+3. [GWAS Step 2: Liftover and Imputation](#liftover-and-imputation)
+4. [GWAS Step 3: Population Structure Modeling, Merging, and Post Imputation QC](#population-structure-modeling)
+5. [GWAS Step 4: Associative Analysis](#associative-analysis)
 
 
 ## Prerequisites
