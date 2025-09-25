@@ -11,6 +11,10 @@ You can replace my data with your own plink data (.bed, .bim, .fam) and replicat
 
 At the end of the tutorial, I provide an application example of using the extracting SNPs and additional FDG-PET data to conduct an imaging-genetics sparse canonical correlation analysis. 
 
+## Table of Contents
+* [Installation](#Prerequisites)
+
+
 ## Prerequisites
 - Install ```plink2, R, python```
 - Install BCFtools (bcftools-1.14) from [http://www.htslib.org/download/](http://www.htslib.org/download/), then: 
