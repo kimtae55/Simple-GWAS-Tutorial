@@ -528,7 +528,10 @@ Calculating allele frequencies... done.
 
 We now visualize/select the significant SNPs using different thresholds:
 ```
+# Refer to https://cloufield.github.io/GWASTutorial/Visualization/#qc-check for different visualization techniques
+python gwaslab_plot.py 
 ```
+
 
 (Optional: Preprocessing steps for Imaging Genetics SCCA application (see last section))
 - try to maintain 300-400 SNPs? make sure p >> n 
