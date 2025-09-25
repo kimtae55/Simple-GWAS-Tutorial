@@ -460,50 +460,35 @@ We want to control for the following covariates: study phase, gender, age, race,
 ```
 **ID variables**
 - `FID`, `IID`: Family and Individual IDs from PLINK `.fam`.  
-  (Used to align covariates with genotype data.)
+  Used to align covariates with genotype data.
+
+**Phenotype**
+- Stored separately as `DIAG01` (CN=1, AD=2, others=-9).
 
 **Demographics / Covariates**
-- `SEX`: Binary sex code (from PLINK `.fam`).  
-  - `1` = Male  
-  - `0` = Female  
-
 - `AGE`: Age at baseline visit (years, numeric).  
-  - Continuous variable.
+- `PTEDUCAT`: Years of education (numeric; e.g., 12 = high school, 16 = college).
 
-- `PTEDUCAT`: Years of education.  
-  - Example: `12` = high school, `16` = college, `18` = graduate school.  
-  - Continuous variable.
+**Sex (from ADNIMERGE `PTGENDER`)**
+- `PTGENDER_Female` = 1 if Female, 0 if Male.  
+  (We do **not** use the `.fam` sex code here.)
 
-**Cohort / Study Phase (COLPROT)**  
-Baseline = **ADNI1**  
-Dummy variables created for the following categories:
-- `COHORT_ADNIGO` = 1 if ADNIGO, 0 otherwise  
-- `COHORT_ADNI2`  = 1 if ADNI2, 0 otherwise  
-- (`ADNI1` is the reference)
+**Race (from ADNIMERGE `PTRACCAT`)**  
+(Reference category is anyone with all race dummies = 0; typically “White”.)
+- `PTRACCAT_AmIndian`   = 1 if “Am Indian/Alaskan”, 0 otherwise  
+- `PTRACCAT_Asian`      = 1 if “Asian”, 0 otherwise  
+- `PTRACCAT_Black`      = 1 if “Black”, 0 otherwise  
+- `PTRACCAT_MoreOne`    = 1 if “More than one”, 0 otherwise  
 
-**Race (PTRACCAT)**  
-Baseline = **White**  
-Dummy variables created for the following categories:
-- `RACE_BLACK`       = 1 if Black, 0 otherwise  
-- `RACE_ASIAN`       = 1 if Asian, 0 otherwise  
-- `RACE_AMERICANIND` = 1 if American Indian/Alaska Native, 0 otherwise  
-- `RACE_MORETHAN1`   = 1 if More than one race, 0 otherwise  
-- (Reference = White)
+**Ethnicity (from ADNIMERGE `PTETHCAT`)**  
+(Reference is “Not Hisp/Latino”, represented by 0.)
+- `PTETHCAT_HispLatino` = 1 if “Hisp/Latino”, 0 otherwise
 
-**Ethnicity (PTETHCAT)**  
-Baseline = **Not Hisp/Latino**  
-Dummy variables created for the following categories:
-- `ETH_HISPANIC` = 1 if Hisp/Latino, 0 otherwise  
-- (Reference = Not Hisp/Latino)
-
-**Marital Status (PTMARRY)**  
-Baseline = **Married**  
-Dummy variables created for the following categories:
-- `MAR_DIVORCED` = 1 if Divorced, 0 otherwise  
-- `MAR_NEVERMARRIED` = 1 if Never married, 0 otherwise  
-- `MAR_WIDOWED` = 1 if Widowed, 0 otherwise  
-- `MAR_UNKNOWN` = 1 if Unknown / Other, 0 otherwise  
-- (Reference = Married)
+**Marital status (from ADNIMERGE `PTMARRY`)**  
+(Reference is anyone with all marital dummies = 0; typically “Married”.)
+- `PTMARRY_Divorced`     = 1 if “Divorced”, 0 otherwise  
+- `PTMARRY_Married`      = 1 if “Married”, 0 otherwise  
+- `PTMARRY_NeverMarried` = 1 if “Never married”, 0 otherwise
 ```
 
 Run GWAS on progression:
