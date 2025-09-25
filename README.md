@@ -12,7 +12,11 @@ You can replace my data with your own plink data (.bed, .bim, .fam) and replicat
 At the end of the tutorial, I provide an application example of using the extracting SNPs and additional FDG-PET data to conduct an imaging-genetics sparse canonical correlation analysis. 
 
 ## Table of Contents
-* [Installation](#Prerequisites)
+* [Setup](#prerequisites)
+* [GWAS Step 1: Pre-imputation QC](#what-are-the-necessary-steps-in-gwas?)
+* [GWAS Step 2: Liftover and Imputation](#liftover-and-imputation)
+* [GWAS Step 3: Population Structure Modeling, Merging, and Post Imputation QC](#population-structure-modeling)
+* [GWAS Step 4: Associative Analysis](#associative-analysis)
 
 
 ## Prerequisites
@@ -441,27 +445,11 @@ awk -F'\t' '$1==19 && ($4==44908684 || $4==44908822)' ADNI_qc_final.bim
 
 ### Associative Analysis:
 
-Stats on the Data:
+I utilize the approporiate demographic data from ADNI studies to curate the covariates that I want to control for confouding, namely: study phase, gender, age, race, ethnicity, education, marital status, top 10 PC
 ```
-== Phase distribution (COLPROT) among matched-in-both (baseline only) ==
-   COLPROT     N    pct
-    <char> <int> <char>
-1:   ADNI2   344  55.3%
-2:   ADNI1   261  42.0%
-3:  ADNIGO    17   2.7%
+Rscript gwas_processing.R
 
-== Baseline diagnosis distribution (DX_bl) among matched-in-both (baseline only) ==
-    DX_bl     N    pct
-   <char> <int> <char>
-1:     CN   234  37.6%
-2:     AD   201  32.3%
-3:   LMCI   149  24.0%
-4:   EMCI    38   6.1%
-```
-This means that I should use ADNI1/ADNIGO/ADNI2 as dummy variables, and CN/MCI/AD as disease groups for later analyses (EMCI has too little samples)
-
-We want to control for the following covariates: study phase, gender, age, race, ethnicity, education, marital status, top 10 PC
-```
+# Variable Description
 **ID variables**
 - `FID`, `IID`: Family and Individual IDs from PLINK `.fam`.  
   Used to align covariates with genotype data.
@@ -498,7 +486,7 @@ Reference = **Married** (all marital dummies = 0).
 - `PC1`–`PC10`: Top 10 principal components from genotype PCA (numeric).
 ```
 
-Run GWAS:
+Now, run GWAS. If you are interested in the model (glm) and the exact equation formulations, read [this](https://cloufield.github.io/GWASTutorial/06_Association_tests/#association-testing-basics)
 ```
 plink2 \
   --bfile ADNI_qc_final \
