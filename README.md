@@ -487,7 +487,7 @@ We want to control for the following covariates: study phase, gender, age, race,
 **Marital status (from ADNIMERGE `PTMARRY`)**  
 (Reference is anyone with all marital dummies = 0; typically “Married”.)
 - `PTMARRY_Divorced`     = 1 if “Divorced”, 0 otherwise  
-- `PTMARRY_Married`      = 1 if “Married”, 0 otherwise  
+- `PTMARRY_Widowed`      = 1 if “Married”, 0 otherwise  
 - `PTMARRY_NeverMarried` = 1 if “Never married”, 0 otherwise
 ```
 
