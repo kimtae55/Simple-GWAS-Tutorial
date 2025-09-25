@@ -17,6 +17,7 @@ At the end of the tutorial, I provide an application example of using the extrac
 3. [GWAS Step 2: Liftover and Imputation](#liftover-and-imputation)
 4. [GWAS Step 3: Population Structure Modeling, Merging, and Post Imputation QC](#population-structure-modeling)
 5. [GWAS Step 4: Associative Analysis](#associative-analysis)
+6. [Application: Sparse Canonical Correlation Analysis using Imaging-Omics (FDG-PET, SNP)](#application-sparse-canonical-correlation-analysis-using-imaging-omics-fdg-pet-snp)
 
 
 ## Prerequisites
