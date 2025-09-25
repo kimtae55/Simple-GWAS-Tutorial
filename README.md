@@ -494,23 +494,55 @@ Reference = **Married** (all marital dummies = 0).
 - `PC1`–`PC10`: Top 10 principal components from genotype PCA (numeric).
 ```
 
-Run GWAS on progression:
-- dummy variables of adni cohort (adni1, adni2, adnigo)
-- gender, age
-- race, ethnicity, education, marital status, 10 PC
+Run GWAS:
+```
+plink2 \
+  --bfile ADNI_qc_final \
+  --keep ADNI_keep_ADvsCN.txt \
+  --pheno ADNI_pheno_ADvsCN.txt \
+  --pheno-name DIAG01 \
+  --covar ADNI_covar_ADvsCN.txt \
+  --covar-name \
+    AGE,PTEDUCAT,PTGENDER_Female, \
+    PTRACCAT_AmIndian,PTRACCAT_Asian,PTRACCAT_Black, \
+    PTRACCAT_MoreOne,PTRACCAT_HawaiianPI, \
+    PTETHCAT_HispLatino, \
+    PTMARRY_Divorced,PTMARRY_Widowed,PTMARRY_NeverMarried, \
+    PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
+  --covar-variance-standardize \
+  --glm hide-covar firth-fallback \
+  --threads 1 \
+  --memory 8000 \
+  --out ADNI_GWAS_ADvsCN
+
+# OUTPUT:
+Start time: Thu Sep 25 00:06:22 2025
+36864 MiB RAM detected; reserving 8000 MiB for main workspace.
+Using 1 compute thread.
+1477 samples (633 females, 844 males; 1477 founders) loaded from
+ADNI_qc_final.fam.
+7918996 variants loaded from ADNI_qc_final.bim.
+1 binary phenotype loaded (294 cases, 441 controls).
+--keep: 735 samples remaining.
+21 covariates loaded from ADNI_covar_ADvsCN.txt.
+735 samples (340 females, 395 males; 735 founders) remaining after main
+filters.
+294 cases and 441 controls remaining after main filters.
+--covar-variance-standardize: 21 covariates transformed.
+Calculating allele frequencies... done.
+--glm logistic-Firth hybrid regression on phenotype 'DIAG01': 1%
+```
+
+We now visualize/select the significant SNPs using different thresholds:
+```
+```
+
+(Optional: Preprocessing steps for Imaging Genetics SCCA application (see last section))
 - try to maintain 300-400 SNPs? make sure p >> n 
-- response variable should be logistic (CN or AD), each regression containing 1 SNP, use pvalue threshold to retain reasonable # of SNP
 - then, before SCCA, do linear regression (regress out the same covariates, and then i
 - check if our snp data contains SNP for APOE4 (double check)
 - for FDG PET, take the average across each ROI, then regress 
-```
-# Modify below to fit your research question. 
-> Rscript subjects_bl_covar.R
-> plink2 --bfile ADNI1_GO2_3_merged_snps.R2_0.3.MAF_0.01.HWE_0.000001.geno_0.05.IBD_0.2 --keep ADNIall_ADandCN_subj.txt --make-bed --out ADNIall_ADandCN_1
-> plink2 --bfile ADNIall_ADandCN_2 --logistic hide-covar --covar ADNIall_ADandCN_covar.txt --allow-no-sex --out ADNIall_ADandCN_test_result
-> plink2 -bfile ADNIall_ADandCN_2 --extract sigSNPs.txt --make-bed --out ADNIall_ADandCN_3
-> plink2 --bfile ADNIall_ADandCN_3 --recodeA --out ADNIall_ADandCN_sigSNPs
-```
+
 
 ## Application: Sparse Canonical Correlation Analysis using Imaging-Omics (FDG-PET, SNP)
 
@@ -519,6 +551,6 @@ Goal: To investigate how genetic variation (SNPs) and brain imaging features (FD
 Input: 
 - (n,p) SNP data matrix (split into CN, MCI, AD)
 - (n,q) FDG-PET data matrix (split into CN, MCI, AD)
-- Note that we did not use disease status (CN, MCI, AD) as outcomes for GWAS, because our goal is not to find SNPs associated with diagnosis, but rather SNPs linked to disease progression. Instead, we selected SNPs based on their association with continuous progression measures (e.g., cognitive decline, imaging biomarkers), so that the same SNP panel can be meaningfully compared across CN, MCI, and AD groups during SCCA.
+
 
 Please read [this]() for the complete application details. 
