@@ -13,7 +13,7 @@ At the end of the tutorial, I provide an application example of using the extrac
 
 ## Table of Contents
 1. [Setup](#prerequisites)
-2. [GWAS Step 1: Pre-imputation QC](#what-are-the-necessary-steps-in-gwas?)
+2. [GWAS Step 1: Pre-imputation QC](#what-are-the-necessary-steps-in-gwas)
 3. [GWAS Step 2: Liftover and Imputation](#liftover-and-imputation)
 4. [GWAS Step 3: Population Structure Modeling, Merging, and Post Imputation QC](#population-structure-modeling)
 5. [GWAS Step 4: Associative Analysis](#associative-analysis)
