@@ -456,7 +456,7 @@ awk -F'\t' '$1==19 && ($4==44908684 || $4==44908822)' ADNI_qc_final.bim
 
 1) I utilize the approporiate demographic data from ADNI studies to curate the covariates that I want to control for confouding, namely: study phase, gender, age, race, ethnicity, education, marital status, top 10 PC
 ```
-Rscript gwas_processing.R
+Rscript gwas_processing_adnimerged.R
 
 # Variable Description
 **STUDY PHASES**
