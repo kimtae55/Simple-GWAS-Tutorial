@@ -459,6 +459,9 @@ awk -F'\t' '$1==19 && ($4==44908684 || $4==44908822)' ADNI_qc_final.bim
 Rscript gwas_processing.R
 
 # Variable Description
+**STUDY PHASES**
+- `PHASE`: ADNI study phases (ADNI1, ADNIGO, ADNI2) controlling for batch effect.
+
 **ID variables**
 - `FID`, `IID`: Family and Individual IDs from PLINK `.fam`.  
   Used to align covariates with genotype data.
@@ -509,6 +512,7 @@ plink2 \
     PTRACCAT_MoreOne,PTRACCAT_HawaiianPI, \
     PTETHCAT_HispLatino, \
     PTMARRY_Divorced,PTMARRY_Widowed,PTMARRY_NeverMarried, \
+    COHORT_ADNIGO,COHORT_ADNI2, \
     PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
   --covar-variance-standardize \
   --glm hide-covar firth-fallback \
