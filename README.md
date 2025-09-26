@@ -48,9 +48,7 @@ In this tutorial, I use PLINK data (`.bed/.bim/.fam`) downloaded from the **ADNI
 For simplicity, all data, scripts, and outputs are stored in a single working directory.
 
 #### Define your base file name
-The `base` string is the prefix shared by your `.bed/.bim/.fam` files.  
-For example:
-
+For all commands from now, `base` string is the path to your original `.bed/.bim/.fam` file.  
 ```bash
 base="ADNI_cluster_01_forward_757LONI"
 ```
