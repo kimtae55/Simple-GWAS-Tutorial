@@ -10,7 +10,7 @@ At the end of the tutorial, I provide an application example of using the extrac
 
 ## Table of Contents
 1. [Setup](#prerequisites)
-2. [GWAS Step 1: Pre-imputation QC](#what-are-the-necessary-steps-in-gwas)
+2. [GWAS Step 1: Pre-imputation QC](#gwas-step-1-pre-imputation-quality-control-qc)
 3. [GWAS Step 2: Liftover and Imputation with TopMed Imputation Server](#liftover-and-imputation)
 4. [GWAS Step 3: Population Structure Modeling, Merging, and Post Imputation QC](#population-structure-modeling)
 5. [GWAS Step 4: Associative Analysis](#associative-analysis)
@@ -53,16 +53,12 @@ For all commands from now, `base` string is the path to your original `.bed/.bim
 base="ADNI_cluster_01_forward_757LONI"
 ```
 
-## What are the necessary steps in GWAS?
-
-### Quality Control --> Liftover and Imputation --> Population Structure Modeling --> Associative Analysis 
+## GWAS Step 1: Pre-imputation Quality Control (QC)
 
 Quality Control is done at a sample-level (to remove bad individuals; e.g. contamination, swaps, relatedness, sex mismatches) and SNP-level (to remove bad variants; e.g. missingness, low MAF, HWE failures).
 If you have multiple datasets from different studies/timepoints, you should run this part separately, then merge the results (see the later optional step for merging)
 
-### QC Steps:
-
-Step 1: Handle missingness per individual and per SNP: Delete individuals with missingness >0.05.
+### 1) Handle missingness per individual and per SNP: Delete individuals with missingness >0.05.
 ```
 # Step 1. Visualize missingness
 plink2 --bfile "$base" --missing
@@ -81,7 +77,7 @@ plink2 --bfile "${base}_2" \
        --out "${base}_3"
 ```
 
-Step 2: Handle sex discrepancy: Subjects who were a priori determined as females must have a F value of <0.2, and subjects who were a priori determined as males must have a F value >0.8. This F value is based on the X chromosome inbreeding (homozygosity) estimate. Subjects who do not fulfil these requirements are flagged "PROBLEM" by PLINK.
+### 2) Handle sex discrepancy: Subjects who were a priori determined as females must have a F value of <0.2, and subjects who were a priori determined as males must have a F value >0.8. This F value is based on the X chromosome inbreeding (homozygosity) estimate. Subjects who do not fulfil these requirements are flagged "PROBLEM" by PLINK.
 ```
 # Step 1. Check sex discrepancies
 plink2 --bfile "${base}_3" \
