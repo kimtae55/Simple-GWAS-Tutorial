@@ -508,10 +508,7 @@ plink2 \
   --covar ADNI_covar_ADvsCN.txt \
   --covar-name \
     AGE,PTEDUCAT,PTGENDER_Female, \
-    PTRACCAT_AmIndian,PTRACCAT_Asian,PTRACCAT_Black, \
-    PTRACCAT_MoreOne,PTRACCAT_HawaiianPI, \
-    PTETHCAT_HispLatino, \
-    PTMARRY_Divorced,PTMARRY_Widowed,PTMARRY_NeverMarried, \
+    PTMARRY_Divorced,PTMARRY_Widowed,PTMARRY_NeverMarried, \ 
     COHORT_ADNIGO,COHORT_ADNI2, \
     PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
   --covar-variance-standardize \
@@ -521,21 +518,21 @@ plink2 \
   --out ADNI_GWAS_ADvsCN
 
 # OUTPUT:
-Start time: Thu Sep 25 00:06:22 2025
+Start time: Fri Sep 26 18:55:49 2025
 36864 MiB RAM detected; reserving 8000 MiB for main workspace.
 Using 1 compute thread.
 1477 samples (633 females, 844 males; 1477 founders) loaded from
 ADNI_qc_final.fam.
 7918996 variants loaded from ADNI_qc_final.bim.
-1 binary phenotype loaded (294 cases, 441 controls).
---keep: 735 samples remaining.
-21 covariates loaded from ADNI_covar_ADvsCN.txt.
-735 samples (340 females, 395 males; 735 founders) remaining after main
+1 binary phenotype loaded (290 cases, 344 controls).
+--keep: 634 samples remaining.
+18 covariates loaded from ADNI_covar_ADvsCN.txt.
+634 samples (272 females, 362 males; 634 founders) remaining after main
 filters.
-294 cases and 441 controls remaining after main filters.
---covar-variance-standardize: 21 covariates transformed.
+290 cases and 344 controls remaining after main filters.
+--covar-variance-standardize: 18 covariates transformed.
 Calculating allele frequencies... done.
---glm logistic-Firth hybrid regression on phenotype 'DIAG01': 1%
+--glm logistic-Firth hybrid regression on phenotype 'DIAG01': 7%
 ```
 
 3) We now visualize/select the significant SNPs using different thresholds:
