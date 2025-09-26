@@ -35,8 +35,6 @@ make install
 
 👉 Add the installation directory (e.g., `/Users/taehyo/Applications/bin`) to your `$PATH` so the executables can be called directly in terminal.
 
----
-
 ### 2. Assumption: SNP Data in PLINK Format
 Your input data should be in **PLINK binary format**:
 
