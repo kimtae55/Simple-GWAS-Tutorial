@@ -58,7 +58,7 @@ base="ADNI_cluster_01_forward_757LONI"
 Quality Control is done at a sample-level (to remove bad individuals; e.g. contamination, swaps, relatedness, sex mismatches) and SNP-level (to remove bad variants; e.g. missingness, low MAF, HWE failures).
 If you have multiple datasets from different studies/timepoints, you should run this part separately, then merge the results (see the later optional step for merging)
 
-### 1) Handle missingness per individual and per SNP: Delete individuals with missingness >0.05.
+1) Handle missingness per individual and per SNP: Delete individuals with missingness >0.05.
 ```
 # Step 1. Visualize missingness
 plink2 --bfile "$base" --missing
@@ -77,7 +77,7 @@ plink2 --bfile "${base}_2" \
        --out "${base}_3"
 ```
 
-### 2) Handle sex discrepancy: Subjects who were a priori determined as females must have a F value of <0.2, and subjects who were a priori determined as males must have a F value >0.8. This F value is based on the X chromosome inbreeding (homozygosity) estimate. Subjects who do not fulfil these requirements are flagged "PROBLEM" by PLINK.
+2) Handle sex discrepancy: Subjects who were a priori determined as females must have a F value of <0.2, and subjects who were a priori determined as males must have a F value >0.8. This F value is based on the X chromosome inbreeding (homozygosity) estimate. Subjects who do not fulfil these requirements are flagged "PROBLEM" by PLINK.
 ```
 # Step 1. Check sex discrepancies
 plink2 --bfile "${base}_3" \
@@ -96,7 +96,7 @@ plink2 --bfile "${base}_3" \
        --out "${base}_4"
 ```
 
-Step 3: Extract autosomal SNPs only and delete SNPs with a low minor allele frequency (MAF <0.01).
+3) Extract autosomal SNPs only and delete SNPs with a low minor allele frequency (MAF <0.01).
 ```
 # Step 1. Extract autosomal SNPs (chr 1–22)
 awk '{ if ($1 >= 1 && $1 <= 22) print $2 }' "${base}_4.bim" > snp_1_22.txt
@@ -122,7 +122,7 @@ plink2 --bfile "${base}_5" \
        --out "${base}_6"
 ```
 
-Step 4: Delete SNPs which are not in Hardy-Weinberg equilibrium (HWE).
+4) Delete SNPs which are not in Hardy-Weinberg equilibrium (HWE).
 ```
 # Step 1. Compute Hardy-Weinberg Equilibrium (HWE) stats
 plink2 --bfile "${base}_6" \
@@ -138,7 +138,7 @@ plink2 --bfile "${base}_6" \
        --out "${base}_7"
 ```
 
-Step 5: Remove individuals with a heterozygosity rate deviating more than 3 sd from the mean.
+5) Remove individuals with a heterozygosity rate deviating more than 3 sd from the mean.
 ```
 # Step 1. LD pruning — exclude long-range high-LD regions, keep independent SNPs
 plink2 --bfile "${base}_7" \
@@ -162,7 +162,7 @@ plink2 --bfile "${base}_7" \
        --out "${base}_8"
 ```
 
-Step 6: We exclude all individuals with a PI_HAT > 0.2 to remove cryptic relatedness, assuming a random population sample.
+6) We exclude all individuals with a PI_HAT > 0.2 to remove cryptic relatedness, assuming a random population sample.
 ```
 # Step 1. LD-prune SNPs (used only for relatedness detection)
 plink2 --bfile "${base}_8" \
@@ -186,9 +186,9 @@ plink2 --bfile "${base}_8" \
        --out "${base}_10"
 ```
 
-### Liftover and Imputation:
+## Liftover and Imputation:
 
-Step 1: ADNI datasets are often on older genome builds (e.g., hg18/NCBI36). Before imputation, convert to GRCh38/hg38. This ensures all datasets use the same genome coordinates, resulting in .bed/.bim/.fam files aligned to GRCh38/hg38. If your data is already aligned to GRCh38/hg38, skip this step.
+1) ADNI datasets are often on older genome builds (e.g., hg18/NCBI36). Before imputation, convert to GRCh38/hg38. This ensures all datasets use the same genome coordinates, resulting in .bed/.bim/.fam files aligned to GRCh38/hg38. If your data is already aligned to GRCh38/hg38, skip this step.
 ```
 # Step 1. Export chr1 VCF to check genome build
 plink2 --bfile "${base}_10" \
@@ -211,7 +211,7 @@ awk 'BEGIN{OFS="\t"} {print "chr"$1, $4-1, $4, $2}' \
 Now go to http://genome.ucsc.edu/cgi-bin/hgLiftOver to convert from original build to GRCh38/hg38, download the lifted files.
 <img src="https://github.com/kimtae55/GWAS-End-to-End-Tutorial/blob/main/figs/liftover.png" width="800">
 
-To convert back to PLINK format and check the build, follow the steps below:
+2) To convert back to PLINK format and check the build, follow the steps below:
 ```
 # Files produced by UCSC LiftOver (you already have these)
 #   - Converted BED (target build, e.g., GRCh38):   hglft_genome_199168_dad920.bed
@@ -261,7 +261,7 @@ print("Assembly:", s.assembly, "Build detected:", s.build_detected)
 PY
 ```
 
-Step 2: Pre-imputation setup
+3) Pre-imputation setup
 ```
 # Step 1. Keep only autosomal chromosomes (1–22)
 plink2 --bfile "${base}_12" \
@@ -293,7 +293,7 @@ done
 ```
 At this point, you have *-chr1.topmed.vcf.gz, ..., *-chr22.topmed.vcf.gz ready for imputation. 
 
-Step 4: Upload the above vcfs to TopMed Imputation Server ([https://imputation.biodatacatalyst.nhlbi.nih.gov/#!run/imputationserver%402.0.0-beta3](https://imputation.biodatacatalyst.nhlbi.nih.gov/#!run/imputationserver%402.0.0-beta3)) for imputation. Once completed:
+4) Upload the above vcfs to TopMed Imputation Server ([https://imputation.biodatacatalyst.nhlbi.nih.gov/#!run/imputationserver%402.0.0-beta3](https://imputation.biodatacatalyst.nhlbi.nih.gov/#!run/imputationserver%402.0.0-beta3)) for imputation. Once completed:
 ```
 > for chr in $(seq 1 22)   
 do
@@ -307,7 +307,7 @@ bcftools annotate -Oz -x ID -I +'%CHROM:%POS:%REF:%ALT' -o ADNI1_allchromosomes.
 > plink2 --vcf ADNI1_allchromosomes.converted.R2_0.3.vcf.gz --double-id --make-bed --out ADNI1_allchromosomes.converted.R2_0.3
 ```
 
-### Population Structure Modeling:
+## Population Structure Modeling:
 
 At this point, I have ADNI1/GO/2 imputed with the TopMed reference panel. I assess ancestry and adjust for population structure by anchoring PCA to an external reference panel (HapMap3 or 1000G). I compute allele-weighted PCs on the combined ADNI + external reference dataset so the axes reflect global ancestry, then project each ADNI cohort onto this shared PC space. The top 10 PCs are saved to be included later as covariates for GWAS. 
 ```
@@ -383,7 +383,7 @@ plink2 --threads $THREADS --memory $MEM --bfile ADNI_merged_2 --snps-only --make
 
 ```
 
-Step 1: Post Imputation/Merge QC
+1) Post Imputation/Merge QC
 ```
 # ---------- restore sex from original fams (FID_IID -> SEX) ----------
 awk '{if($5==1||$5==2) print $1"_"$2, $5}' ADNI_1/ADNI_cluster_01_forward_757LONI_11.fam > fid_iid_sex.map
@@ -436,7 +436,7 @@ plink2 --threads 1 --memory 8000 --bfile ADNI_qc7 --keep unrelated.keep --make-b
 ```
 Now, we can finally proceed to population stratification and gwas using the ADNI_qc_final dataset
 
-Step 2: Population stratification is corrected by extracting principal components (PCs) for each dataset separately using LD-pruned SNPs. The top PCs are used as covariates in GWAS to control for ancestry differences. 
+2) Population stratification is corrected by extracting principal components (PCs) for each dataset separately using LD-pruned SNPs. The top PCs are used as covariates in GWAS to control for ancestry differences. 
 ```
 # LD prune (exclude long-range LD regions on hg38 to avoid correlated SNPs)
 plink2 --threads 1 --memory 8000 --bfile ADNI_qc_final --exclude range high-LD-regions-hg38-GRCh38.txt --indep-pairwise 200 100 0.1 --out indepSNP_pca
@@ -445,7 +445,7 @@ plink2 --threads 1 --memory 8000 --bfile ADNI_qc_final --exclude range high-LD-r
 plink2 --threads 1 --memory 8000 --bfile ADNI_qc_final --extract indepSNP_pca.prune.in --pca 20 approx --out ADNI_pca
 ```
 
-Because the APOE4 allele is determined by a specific combination of two single nucleotide polymorphisms (SNPs): rs429358 and rs7412. For APOE4, the combination is defined by a C allele at position 19:44908684 (rs429358) and a C allele at position 19:44908822 (rs7412), I make sure my dataset contains these SNPs - I need to check again after running GWAS.
+3) Because the APOE4 allele is determined by a specific combination of two single nucleotide polymorphisms (SNPs): rs429358 and rs7412. For APOE4, the combination is defined by a C allele at position 19:44908684 (rs429358) and a C allele at position 19:44908822 (rs7412), I make sure my dataset contains these SNPs - I need to check again after running GWAS.
 ```
 awk -F'\t' '$1==19 && ($4==44908684 || $4==44908822)' ADNI_qc_final.bim
 # 19	chr19:44908684:T:C	0	44908684	C	T
@@ -454,7 +454,7 @@ awk -F'\t' '$1==19 && ($4==44908684 || $4==44908822)' ADNI_qc_final.bim
 
 ### Associative Analysis:
 
-I utilize the approporiate demographic data from ADNI studies to curate the covariates that I want to control for confouding, namely: study phase, gender, age, race, ethnicity, education, marital status, top 10 PC
+1) I utilize the approporiate demographic data from ADNI studies to curate the covariates that I want to control for confouding, namely: study phase, gender, age, race, ethnicity, education, marital status, top 10 PC
 ```
 Rscript gwas_processing.R
 
@@ -495,7 +495,7 @@ Reference = **Married** (all marital dummies = 0).
 - `PC1`–`PC10`: Top 10 principal components from genotype PCA (numeric).
 ```
 
-Now, run GWAS. If you are interested in the model (glm) and the exact equation formulations, read [this](https://cloufield.github.io/GWASTutorial/06_Association_tests/#association-testing-basics)
+2) Now, run GWAS. If you are interested in the model (glm) and the exact equation formulations, read [this](https://cloufield.github.io/GWASTutorial/06_Association_tests/#association-testing-basics)
 ```
 plink2 \
   --bfile ADNI_qc_final \
@@ -534,21 +534,13 @@ Calculating allele frequencies... done.
 --glm logistic-Firth hybrid regression on phenotype 'DIAG01': 1%
 ```
 
-We now visualize/select the significant SNPs using different thresholds:
+3) We now visualize/select the significant SNPs using different thresholds:
 ```
 # Refer to https://cloufield.github.io/GWASTutorial/Visualization/#qc-check for different visualization techniques
 python gwaslab_plot.py 
 ```
 <img src="https://github.com/kimtae55/GWAS-End-to-End-Tutorial/blob/main/figs/gwas_mqq_plot.png" width="800">
 <img src="https://github.com/kimtae55/GWAS-End-to-End-Tutorial/blob/main/figs/gwas_chr19_region.png" width="800">
-
-
-(Optional: Preprocessing steps for Imaging Genetics SCCA application (see last section))
-- try to maintain 300-400 SNPs? make sure p >> n 
-- then, before SCCA, do linear regression (regress out the same covariates, and then i
-- check if our snp data contains SNP for APOE4 (double check)
-- for FDG PET, take the average across each ROI, then regress 
-
 
 ## Application: Sparse Canonical Correlation Analysis using Imaging-Omics (FDG-PET, SNP)
 
@@ -558,5 +550,8 @@ Input:
 - (n,p) SNP data matrix (split into CN, MCI, AD)
 - (n,q) FDG-PET data matrix (split into CN, MCI, AD)
 
-
-Please read [this]() for the complete application details. 
+### Preprocessing steps based on raw GWAS output and FDG-PET data
+- try to maintain 300-400 SNPs? make sure p >> n 
+- then, before SCCA, do linear regression (regress out the same covariates, and then i
+- check if our snp data contains SNP for APOE4 (double check)
+- for FDG PET, take the average across each ROI, then regress 
