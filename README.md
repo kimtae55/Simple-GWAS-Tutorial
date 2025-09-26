@@ -20,7 +20,7 @@ At the end of the tutorial, I provide an application example of using the extrac
 # Prerequisites
 
 ### 1. Install Required Software
-- **plink2**
+- **plink & plink2** (merge functions are not fully implemented for plink2 as of 09.25.2025, but should be updated soon)
 - **R**
 - **Python**
 - **BCFtools** (≥ v1.14) from [htslib.org](http://www.htslib.org/download/)
