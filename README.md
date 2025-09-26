@@ -2,42 +2,58 @@
 This is a Step by Step Tutorial for GWAS (for Plink format), explaining what SNP data looks like, how to perform quality control and imputation procedures, and how to run GWAS.
 Credits for the figures and explanations here go to the more in-depth tutorials: [GWASTutorial1](https://cloufield.github.io/GWASTutorial), [GWASTutorial2](https://www.ncbi.nlm.nih.gov/pubmed/29484742), or [GWASTutorial3](https://pmc.ncbi.nlm.nih.gov/articles/PMC6001694/). The main pipeline is inspired by code from [https://github.com/MareesAT/GWA_tutorial](https://github.com/MareesAT/GWA_tutorial). 
  
-Most GWAS tutorials out there only support plink and older genome build (e.g. hg18, hg19), so this tutorial provides plink2 and hg38 compatible instructions. 
+Most GWAS tutorials out there only support plink and older genome build (e.g. hg18, hg19), so this tutorial provides plink2/hg38/TopMed reference panel compatible instructions. 
 
-You can replace my data with your own plink data (.bed, .bim, .fam) and replicate the whole experiment. 
-- If you plan to use GRCh37/hg19 genome build, follow instructions [here](https://github.com/kimtae55/Simple-GWAS-Tutorial/tree/main/GRCh37_hg19).
-- If you plan to use GRCh38/hg38 genome build, stay on this page.
-- For research, GRCh38/hg38 is recommended as it is the most up-to-date human genome build (released 2013). 
+You can replace my data with your own plink data (.bed, .bim, .fam) and replicate the whole experiment. Note that GRCh38/hg38 is highly recommended as it is the most up-to-date human genome build (released 2013). 
 
 At the end of the tutorial, I provide an application example of using the extracting SNPs and additional FDG-PET data to conduct an imaging-genetics sparse canonical correlation analysis. 
 
 ## Table of Contents
 1. [Setup](#prerequisites)
 2. [GWAS Step 1: Pre-imputation QC](#what-are-the-necessary-steps-in-gwas)
-3. [GWAS Step 2: Liftover and Imputation](#liftover-and-imputation)
+3. [GWAS Step 2: Liftover and Imputation with TopMed Imputation Server](#liftover-and-imputation)
 4. [GWAS Step 3: Population Structure Modeling, Merging, and Post Imputation QC](#population-structure-modeling)
 5. [GWAS Step 4: Associative Analysis](#associative-analysis)
 6. [Application: Sparse Canonical Correlation Analysis using Imaging-Omics (FDG-PET, SNP)](#application-sparse-canonical-correlation-analysis-using-imaging-omics-fdg-pet-snp)
 
 
-## Prerequisites
-- Install ```plink2, R, python```
-- Install BCFtools (bcftools-1.14) from [http://www.htslib.org/download/](http://www.htslib.org/download/), then: 
-```
-> cd bcftools-1.14    # and similarly for bcftools and htslib
-> ./configure --prefix=/Users/taehyo/Applications/
-> make
-> make install
-```
-- Note: Add above executables to $PATH for convenience. 
+# Prerequisites
 
-## Assumption: You have SNP data in PLINK format
+### 1. Install Required Software
+- **plink2**
+- **R**
+- **Python**
+- **BCFtools** (≥ v1.14) from [htslib.org](http://www.htslib.org/download/)
+
+#### Example: Installing BCFtools
+```bash
+cd bcftools-1.14        # navigate into the bcftools source folder (repeat similarly for htslib if needed)
+./configure --prefix=/Users/taehyo/Applications/
+make
+make install
+```
+
+👉 Add the installation directory (e.g., `/Users/taehyo/Applications/bin`) to your `$PATH` so the executables can be called directly in terminal.
+
+---
+
+### 2. Assumption: SNP Data in PLINK Format
+Your input data should be in **PLINK binary format**:
+
+- `.bed` → binary genotype data  
+- `.bim` → SNP information  
+- `.fam` → family/individual information  
+
 <img src="https://github.com/kimtae55/GWAS-End-to-End-Tutorial/blob/main/figs/plink.png" width="600">
 
-In my case, I use Plink data (.bed, .bim, .fam files) downloaded from the ADNI1, ADNI2, and ADNIGO studies. For simplicity, all data, scripts, and outputs will be located in a single working directory. 
+In this tutorial, I use PLINK data (`.bed/.bim/.fam`) downloaded from the **ADNI1, ADNI2, and ADNIGO** studies.  
+For simplicity, all data, scripts, and outputs are stored in a single working directory.
 
-In terminal, define your base file name (string that precedes your .bed, .bim, .fam filenames)
-```
+#### Define your base file name
+The `base` string is the prefix shared by your `.bed/.bim/.fam` files.  
+For example:
+
+```bash
 base="ADNI_cluster_01_forward_757LONI"
 ```
 
