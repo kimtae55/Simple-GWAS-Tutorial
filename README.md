@@ -500,7 +500,7 @@ Reference = **Married** (all marital dummies = 0).
 
 2) Now, run GWAS. If you are interested in the model (glm) and the exact equation formulations, read [this](https://cloufield.github.io/GWASTutorial/06_Association_tests/#association-testing-basics)
 ```
-plink2 \
+plink2 \              
   --bfile ADNI_qc_final \
   --keep ADNI_keep_ADvsCN.txt \
   --pheno ADNI_pheno_ADvsCN.txt \
@@ -508,7 +508,10 @@ plink2 \
   --covar ADNI_covar_ADvsCN.txt \
   --covar-name \
     AGE,PTEDUCAT,PTGENDER_Female, \
-    PTMARRY_Divorced,PTMARRY_Widowed,PTMARRY_NeverMarried, \ 
+    PTRACCAT_AmIndian,PTRACCAT_Asian, PTRACCAT_Black \
+    PTRACCAT_MoreOne,PTRACCAT_HawaiianPI, \
+    PTETHCAT_HispLatino, \
+    PTMARRY_Divorced,PTMARRY_Widowed,PTMARRY_NeverMarried, \
     COHORT_ADNIGO,COHORT_ADNI2, \
     PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
   --covar-variance-standardize \
