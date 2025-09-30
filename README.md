@@ -548,14 +548,45 @@ python gwaslab_plot.py
 
 ## Application: Sparse Canonical Correlation Analysis using Imaging-Omics (FDG-PET, SNP)
 
-Goal: To investigate how genetic variation (SNPs) and brain imaging features (FDG-PET ROIs) are related, and to assess how these associations change across disease stages (CN, MCI, AD). We use Sparse Canonical Correlation Analysis (SCCA) to identify low-dimensional, interpretable patterns linking high-dimensional SNP data with FDG-PET imaging phenotypes.
+### Goal: To investigate how genetic variation (SNPs) and brain imaging features (FDG-PET ROIs) are related, and to assess how these associations change across disease stages (CN and AD). We use Sparse Canonical Correlation Analysis (SCCA) to identify low-dimensional, interpretable patterns linking high-dimensional SNP data with FDG-PET imaging phenotypes.
 
 Input: 
-- (n,p) SNP data matrix (split into CN, MCI, AD)
-- (n,q) FDG-PET data matrix (split into CN, MCI, AD)
+- (n,p) SNP data matrix (split into CN, AD)
+- (n,q) FDG-PET data matrix (split into CN, AD)
 
-### Preprocessing steps based on raw GWAS output and FDG-PET data
-- try to maintain 300-400 SNPs? make sure p >> n 
+Preprocessing steps based on raw GWAS output and FDG-PET data
 - then, before SCCA, do linear regression (regress out the same covariates, and then i
 - check if our snp data contains SNP for APOE4 (double check)
-- for FDG PET, take the average across each ROI, then regress 
+- for FDG PET, take the average across each ROI, then regress
+I get 336 significant SNPs using 1e-4 threshold so that p >> n, and I extract subjects that have both FDG PET and GWAS data : 
+```
+-- DX_bl --
+    level     N    pct
+   <fctr> <int> <char>
+1:     CN   234  37.6%
+2:     AD   201  32.3%
+3:   LMCI   149  24.0%
+4:   EMCI    38   6.1%
+
+-- COLPROT --
+    level     N    pct
+   <fctr> <int> <char>
+1:  ADNI2   344  55.3%
+2:  ADNI1   261  42.0%
+3: ADNIGO    17   2.7%
+
+-- PTGENDER --
+    level     N    pct
+   <fctr> <int> <char>
+1:   Male   376  60.5%
+2: Female   246  39.5%
+```
+To do all this, run 
+```
+Rscript merge_and_regress.R
+```
+which should give me (n_cn, p) and (n_ad, p) data matrix for SNP, and (n_cn, q) and (n_ad, q) matrix for FDG PET.  
+
+### Goal: To assess the metabolic connectivities for CN vs AD patients using FDG PET data 
+which should give me K (n_cn, p) and (n_ad, p) data matrices of ICA componenets representing metabolic connectivity of K brain subnetworks. 
+
