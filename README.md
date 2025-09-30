@@ -554,11 +554,10 @@ Input:
 - (n,p) SNP data matrix (split into CN, AD)
 - (n,q) FDG-PET data matrix (split into CN, AD)
 
-Preprocessing steps based on raw GWAS output and FDG-PET data
-- then, before SCCA, do linear regression (regress out the same covariates, and then i
-- check if our snp data contains SNP for APOE4 (double check)
-- for FDG PET, take the average across each ROI, then regress
-I get 336 significant SNPs using 1e-4 threshold so that p >> n, and I extract subjects that have both FDG PET and GWAS data : 
+- for FDG PET, take the average across each 120 ROI
+- do linear regression (outcome is the SNP/FDG PET value, and covariates are study phase, age, education, race, ethnicity, marital status, sex)
+- we will use the residuals as the elements of the nxp, nxq matrices
+- I get 336 significant SNPs using 1e-4 threshold so that p >> n, and I extract subjects that have both FDG PET and GWAS data : 
 ```
 -- DX_bl --
     level     N    pct
