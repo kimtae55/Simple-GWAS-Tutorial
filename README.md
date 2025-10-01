@@ -550,6 +550,22 @@ python gwaslab_plot.py
 
 ### Goal: To investigate how genetic variation (SNPs) and brain imaging features (FDG-PET ROIs) are related, and to assess how these associations change across disease stages (CN and AD). We use Sparse Canonical Correlation Analysis (SCCA) to identify low-dimensional, interpretable patterns linking high-dimensional SNP data with FDG-PET imaging phenotypes.
 
+```
+python fdg_process.py
+
+tail -n +2 GWAS_hits_suggestive_1e-4.csv \
+  | cut -d',' -f1 \
+  | tr -d '\r' \
+  > hits.snplist
+
+plink2 --bfile ADNI_qc_final \
+       --extract hits.snplist \
+       --export A \
+       --out ADNI_qc_final_sigsnps
+
+python fdgpet_gwas_regress.py
+```
+
 Input: 
 - (n,p) SNP data matrix (split into CN, AD)
 - (n,q) FDG-PET data matrix (split into CN, AD)
