@@ -563,6 +563,12 @@ plink2 --bfile ADNI_qc_final \
        --export A \
        --out ADNI_qc_final_sigsnps
 
+awk 'BEGIN{OFS="\t"} {
+  printf "%s\t%s", $1, $2;
+  for (i=7; i<=NF; i++) printf "\t%s", $i;
+  printf "\n"
+}' ADNI_qc_final_sigsnps.raw > ADNI_gwas_matrix.tsv
+
 python fdgpet_gwas_regress.py
 ```
 
