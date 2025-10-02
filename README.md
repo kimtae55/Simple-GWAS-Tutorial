@@ -550,9 +550,12 @@ python gwaslab_plot.py
 
 ### Goal: To investigate how genetic variation (SNPs) and brain imaging features (FDG-PET ROIs) are related, and to assess how these associations change across disease stages (CN and AD). We use Sparse Canonical Correlation Analysis (SCCA) to identify low-dimensional, interpretable patterns linking high-dimensional SNP data with FDG-PET imaging phenotypes.
 
+Run below for some pre-processing:
 ```
+# For each region of 120 ROIs, take the average value 
 python fdg_process.py
 
+# Extract GWAS data containing 336 SNPs based on the 1e-4 threshold - here we just want to meet the p >> n condition for our SCCA analysis. 
 tail -n +2 GWAS_hits_suggestive_1e-4.csv \
   | cut -d',' -f1 \
   | tr -d '\r' \
@@ -569,18 +572,13 @@ awk 'BEGIN{OFS="\t"} {
   printf "\n"
 }' ADNI_qc_final_sigsnps.raw > ADNI_gwas_matrix.tsv
 
+# Extract patients that both have GWAS and FDGPET data
+# Compute residuals of GWAS & FDGPET features by fitting study phase, age, education, race, ethnicity, marital status, sex (we do this to remove the effect of these potential confounders) 
+# Split the matrices based on AD vs CN group
+# Compute Z-score within each group (mean 0, unit variance)
 python fdgpet_gwas_regress.py
-```
 
-Input: 
-- (n,p) SNP data matrix (split into CN, AD)
-- (n,q) FDG-PET data matrix (split into CN, AD)
-
-- for FDG PET, take the average across each 120 ROI
-- do linear regression (outcome is the SNP/FDG PET value, and covariates are study phase, age, education, race, ethnicity, marital status, sex)
-- we will use the residuals as the elements of the nxp, nxq matrices
-- I get 336 significant SNPs using 1e-4 threshold so that p >> n, and I extract subjects that have both FDG PET and GWAS data : 
-```
+OUTPUT:
 -- DX_bl --
     level     N    pct
    <fctr> <int> <char>
@@ -602,11 +600,7 @@ Input:
 1:   Male   376  60.5%
 2: Female   246  39.5%
 ```
-To do all this, run 
-```
-Rscript merge_and_regress.R
-```
-which should give me (n_cn, p) and (n_ad, p) data matrix for SNP, and (n_cn, q) and (n_ad, q) matrix for FDG PET.  
+which should give me (n_cn, p) and (n_ad, p) data matrix for SNP, and (n_cn, q) and (n_ad, q) matrix for FDG PET. These data matrices are column cenetered with mean 0, and scaled to have unit variance, and are now ready for SCCA analysis. 
 
 ### Goal: To assess the metabolic connectivities for CN vs AD patients using FDG PET data 
 which should give me K (n_cn, p) and (n_ad, p) data matrices of ICA componenets representing metabolic connectivity of K brain subnetworks. 
