@@ -586,7 +586,7 @@ GWAS_ad_z: (201, 336) --> p >> n
 ```
 which should give me (n_cn, p) and (n_ad, p) data matrix for SNP, and (n_cn, q) and (n_ad, q) matrix for FDG PET. These data matrices are column cenetered with mean 0, and scaled to have unit variance, and are now ready for SCCA analysis. 
 
-### Analysis 2: To characterize and compare metabolic connectivity patterns in CN and AD groups using FDG-PET data
+### Analysis 2: To characterize metabolic connectivity patterns in CN and AD groups using FDG-PET data
 
  K (n_cn, p) and (n_ad, p) data matrices of ICA componenets representing metabolic connectivity of K brain subnetworks. 
 
