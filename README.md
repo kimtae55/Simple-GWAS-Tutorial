@@ -548,7 +548,7 @@ python gwaslab_plot.py
 
 ## Application: Sparse Canonical Correlation Analysis using Imaging-Omics (FDG-PET, SNP)
 
-### Goal: To investigate how genetic variation (SNPs) and brain imaging features (FDG-PET ROIs) are related, and to assess how these associations change across disease stages (CN and AD). We use Sparse Canonical Correlation Analysis (SCCA) to identify low-dimensional, interpretable patterns linking high-dimensional SNP data with FDG-PET imaging phenotypes.
+### Analysis 1: To investigate how genetic variation (SNPs) and brain imaging features (FDG-PET ROIs) are related across disease stages (CN and AD).
 
 Run below for some pre-processing:
 ```
@@ -586,6 +586,7 @@ GWAS_ad_z: (201, 336) --> p >> n
 ```
 which should give me (n_cn, p) and (n_ad, p) data matrix for SNP, and (n_cn, q) and (n_ad, q) matrix for FDG PET. These data matrices are column cenetered with mean 0, and scaled to have unit variance, and are now ready for SCCA analysis. 
 
-### Goal: To assess the metabolic connectivities for CN vs AD patients using FDG PET data 
-which should give me K (n_cn, p) and (n_ad, p) data matrices of ICA componenets representing metabolic connectivity of K brain subnetworks. 
+### Analysis 2: To characterize and compare metabolic connectivity patterns in CN and AD groups using FDG-PET data
+
+ K (n_cn, p) and (n_ad, p) data matrices of ICA componenets representing metabolic connectivity of K brain subnetworks. 
 
