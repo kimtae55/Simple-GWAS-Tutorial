@@ -578,27 +578,11 @@ awk 'BEGIN{OFS="\t"} {
 # Compute Z-score within each group (mean 0, unit variance)
 python fdgpet_gwas_regress.py
 
-OUTPUT:
--- DX_bl --
-    level     N    pct
-   <fctr> <int> <char>
-1:     CN   234  37.6%
-2:     AD   201  32.3%
-3:   LMCI   149  24.0%
-4:   EMCI    38   6.1%
-
--- COLPROT --
-    level     N    pct
-   <fctr> <int> <char>
-1:  ADNI2   344  55.3%
-2:  ADNI1   261  42.0%
-3: ADNIGO    17   2.7%
-
--- PTGENDER --
-    level     N    pct
-   <fctr> <int> <char>
-1:   Male   376  60.5%
-2: Female   246  39.5%
+== Dataset shapes ==
+FDG_cn_z: (234, 120)
+FDG_ad_z: (201, 120)
+GWAS_cn_z: (234, 336) --> p >> n
+GWAS_ad_z: (201, 336) --> p >> n
 ```
 which should give me (n_cn, p) and (n_ad, p) data matrix for SNP, and (n_cn, q) and (n_ad, q) matrix for FDG PET. These data matrices are column cenetered with mean 0, and scaled to have unit variance, and are now ready for SCCA analysis. 
 
