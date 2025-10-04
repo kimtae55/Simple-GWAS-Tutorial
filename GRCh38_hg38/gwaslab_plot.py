@@ -4,7 +4,7 @@ import numpy as np
 # 1. Load your PLINK2 GWAS results
 # The key is to tell gwaslab which column has the p-values, effect allele, etc.
 # For plink2 --glm files, use fmt="plink2"
-gwas_file = "ADNI_GWAS_ADvsCN.DIAG01.glm.logistic.hybrid"
+gwas_file = "ADNI_GWAS_ADvsCN1.DIAG01.glm.logistic.hybrid"
 
 # Load PLINK2 GWAS results
 ss = gl.Sumstats(gwas_file, fmt="plink2")
@@ -18,6 +18,8 @@ df[df["P"] < 2e-4 ].to_csv("GWAS_hits_suggestive_2e-4.csv",    index=False)
 df[df["P"] < 3e-4 ].to_csv("GWAS_hits_suggestive_3e-4.csv",    index=False)
 df[df["P"] < 4e-4 ].to_csv("GWAS_hits_suggestive_4e-4.csv",    index=False)
 df[df["P"] < 5e-4 ].to_csv("GWAS_hits_suggestive_5e-4.csv",    index=False)
+df[df["P"] < 5e-2 ].to_csv("GWAS_hits_suggestive_5e-2.csv",    index=False)
+
 print('top sig snps saved')
 
 # Manhattan plot and QQ plot
