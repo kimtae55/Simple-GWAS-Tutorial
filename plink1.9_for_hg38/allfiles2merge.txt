@@ -1,0 +1,3 @@
+ADNI1_intersect_snps
+ADNI2_intersect_snps
+ADNI3_intersect_snps
